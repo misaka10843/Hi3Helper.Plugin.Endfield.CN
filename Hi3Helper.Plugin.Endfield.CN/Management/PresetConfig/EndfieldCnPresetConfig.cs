@@ -14,14 +14,14 @@ namespace Hi3Helper.Plugin.Endfield.CN.Management.PresetConfig;
 [GeneratedComClass]
 public partial class EndfieldCnPresetConfig : PluginPresetConfigBase
 {
-    private const string ExecutableName = "Endfield.exe";
+    private const string ExEcutableName = "Endfield.exe";
 
-    private const string AppCode = "6LL0KJuqHBVz33WK";
-    private const string Channel = "1";
-    private const string SubChannel = "1";
+    private const string ExAppCode = "6LL0KJuqHBVz33WK";
+    private const string ExChannel = "1";
+    private const string ExSubChannel = "1";
 
     [field: AllowNull] [field: MaybeNull] public override string GameName => field ??= "明日方舟：终末地";
-    [field: AllowNull] [field: MaybeNull] public override string GameExecutableName => field ??= ExecutableName;
+    [field: AllowNull] [field: MaybeNull] public override string GameExecutableName => field ??= ExEcutableName;
 
     public override string GameAppDataPath
     {
@@ -65,19 +65,19 @@ public partial class EndfieldCnPresetConfig : PluginPresetConfigBase
 
     public override ILauncherApiMedia? LauncherApiMedia
     {
-        get => field ??= new EndfieldLauncherApiMedia(AppCode, Channel, SubChannel);
+        get => field ??= new EndfieldLauncherApiMedia(ExAppCode, ExChannel, ExSubChannel);
         set;
     }
 
     public override ILauncherApiNews? LauncherApiNews
     {
-        get => field ??= new EndfieldLauncherApiNews(AppCode, Channel, SubChannel);
+        get => field ??= new EndfieldLauncherApiNews(ExAppCode, ExChannel, ExSubChannel);
         set;
     }
 
     public override IGameManager? GameManager
     {
-        get => field ??= new EndfieldGameManager(ExecutableName, "");
+        get => field ??= new EndfieldGameManager(ExEcutableName, "");
         set;
     }
 

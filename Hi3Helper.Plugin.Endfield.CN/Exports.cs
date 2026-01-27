@@ -5,7 +5,7 @@ using Hi3Helper.Plugin.Core.Management;
 
 namespace Hi3Helper.Plugin.Endfield.CN;
 
-public class Exports : SharedStaticV1Ext<Exports>
+public partial class Exports : SharedStaticV1Ext<Exports>
 {
     static Exports()
     {

@@ -35,7 +35,8 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
         return await endfieldManager.InitAsyncInner(true, token).ConfigureAwait(false);
     }
 
-    protected override async Task<long> GetGameSizeAsyncInner(GameInstallerKind gameInstallerKind, CancellationToken token)
+    protected override async Task<long> GetGameSizeAsyncInner(GameInstallerKind gameInstallerKind,
+        CancellationToken token)
     {
         await InitAsync(token).ConfigureAwait(false);
 
@@ -43,14 +44,13 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
 
         long totalSize = 0;
         foreach (var pack in packs)
-        {
             if (long.TryParse(pack.PackageSize, out var size))
                 totalSize += size;
-        }
         return totalSize;
     }
 
-    protected override async Task<long> GetGameDownloadedSizeAsyncInner(GameInstallerKind gameInstallerKind, CancellationToken token)
+    protected override async Task<long> GetGameDownloadedSizeAsyncInner(GameInstallerKind gameInstallerKind,
+        CancellationToken token)
     {
         await InitAsync(token).ConfigureAwait(false);
         if (GameManager is not EndfieldGameManager { GamePacks: { } packs }) return 0L;
@@ -65,7 +65,7 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
         foreach (var pack in packs)
         {
             if (string.IsNullOrEmpty(pack.Url)) continue;
-            
+
             var fileName = Path.GetFileName(new Uri(pack.Url).LocalPath);
             var filePath = Path.Combine(downloadDir, fileName);
 
@@ -80,25 +80,30 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
                     downloadedSize += new FileInfo(tempPath).Length;
             }
         }
+
         return downloadedSize;
     }
 
-    protected override Task StartInstallAsyncInner(InstallProgressDelegate? progressDelegate, InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
+    protected override Task StartInstallAsyncInner(InstallProgressDelegate? progressDelegate,
+        InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
     {
         return StartInstallCoreAsync(GameInstallerKind.Install, progressDelegate, progressStateDelegate, token);
     }
 
-    protected override Task StartUpdateAsyncInner(InstallProgressDelegate? progressDelegate, InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
+    protected override Task StartUpdateAsyncInner(InstallProgressDelegate? progressDelegate,
+        InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
     {
         return StartInstallCoreAsync(GameInstallerKind.Update, progressDelegate, progressStateDelegate, token);
     }
 
-    protected override Task StartPreloadAsyncInner(InstallProgressDelegate? progressDelegate, InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
+    protected override Task StartPreloadAsyncInner(InstallProgressDelegate? progressDelegate,
+        InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
     {
         return StartInstallCoreAsync(GameInstallerKind.Preload, progressDelegate, progressStateDelegate, token);
     }
 
-    private Task StartInstallCoreAsync(GameInstallerKind kind, InstallProgressDelegate? progressDelegate, InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
+    private Task StartInstallCoreAsync(GameInstallerKind kind, InstallProgressDelegate? progressDelegate,
+        InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
     {
         var installer = new Install(this);
         return installer.RunAsync(kind, progressDelegate, progressStateDelegate, token);
@@ -112,7 +117,7 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
         GameManager.GetGamePath(out var installPath);
         if (string.IsNullOrEmpty(installPath)) return Task.CompletedTask;
 
-        try 
+        try
         {
             if (Directory.Exists(installPath))
                 Directory.Delete(installPath, true);
@@ -121,6 +126,7 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
         {
             SharedStatic.InstanceLogger.LogError($"[Endfield] Uninstall failed: {ex.Message}");
         }
+
         return Task.CompletedTask;
     }
 

@@ -20,7 +20,7 @@ namespace Hi3Helper.Plugin.Endfield.CN.Management.Api;
 [GeneratedComClass]
 public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
 {
-    private const string WebApiUrl = "https://launcher.hypergryph.com/api/proxy/web/batch_proxy";
+    private const string ExWebApiUrl = "https://launcher.hypergryph.com/api/proxy/web/batch_proxy";
     private readonly string _appCode;
     private readonly string _channel;
     private readonly string _subChannel;
@@ -50,7 +50,7 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
         set;
     }
 
-    protected override string ApiResponseBaseUrl => WebApiUrl;
+    protected override string ApiResponseBaseUrl => ExWebApiUrl;
 
     protected override async Task<int> InitAsync(CancellationToken token)
     {
@@ -65,7 +65,7 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
 
         try
         {
-            using var response = await ApiResponseHttpClient.PostAsJsonAsync(WebApiUrl, requestBody,
+            using var response = await ApiResponseHttpClient.PostAsJsonAsync(ExWebApiUrl, requestBody,
                 EndfieldApiContext.Default.EndfieldBatchRequest, token);
             response.EnsureSuccessStatusCode();
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,9 +37,7 @@ internal partial class EndfieldGameInstaller
 
             if (_owner.GameManager is not EndfieldGameManager manager || manager.GamePacks == null ||
                 manager.GamePacks.Count == 0)
-            {
                 throw new InvalidOperationException("No download packs found in API response.");
-            }
 
             _owner.GameManager.GetGamePath(out var installPath);
             if (string.IsNullOrEmpty(installPath)) throw new InvalidOperationException("Install path is missing.");
@@ -101,9 +98,9 @@ internal partial class EndfieldGameInstaller
                     var fileName = Path.GetFileName(new Uri(pack.Url).LocalPath);
                     var filePath = Path.Combine(downloadDir, fileName);
                     var tempPath = filePath + ".tmp";
-                    long expectedSize = long.Parse(pack.PackageSize ?? "0");
+                    var expectedSize = long.Parse(pack.PackageSize ?? "0");
 
-                    await DownloadFileAsync(pack.Url!, tempPath, expectedSize, innerToken, (delta) =>
+                    await DownloadFileAsync(pack.Url!, tempPath, expectedSize, innerToken, delta =>
                     {
                         Interlocked.Add(ref progress.DownloadedBytes, delta);
                         Report(InstallProgressState.Download);
@@ -111,7 +108,7 @@ internal partial class EndfieldGameInstaller
 
                     if (!string.IsNullOrEmpty(pack.Md5))
                     {
-                        bool isMatch = await CheckMd5Async(tempPath, pack.Md5, innerToken);
+                        var isMatch = await CheckMd5Async(tempPath, pack.Md5, innerToken);
                         if (!isMatch)
                         {
                             try
@@ -204,9 +201,7 @@ internal partial class EndfieldGameInstaller
 
             var finalInfo = new FileInfo(tempPath);
             if (finalInfo.Length != expectedSize)
-            {
                 throw new Exception($"Download incomplete. Expected {expectedSize}, got {finalInfo.Length}");
-            }
         }
 
         private async Task<bool> CheckMd5Async(string filePath, string expectedMd5, CancellationToken token)
@@ -255,7 +250,7 @@ internal partial class EndfieldGameInstaller
                     using var multiStream = new MultiVolumeStream(partFiles);
                     using var archiveFile = new ArchiveFile(multiStream);
 
-                    long totalSize = archiveFile.Entries.Sum(x => (long)x.Size);
+                    var totalSize = archiveFile.Entries.Sum(x => (long)x.Size);
                     long currentRead = 0;
 
                     void ZipProgressAdapter(object? sender, ExtractProgressProp e)

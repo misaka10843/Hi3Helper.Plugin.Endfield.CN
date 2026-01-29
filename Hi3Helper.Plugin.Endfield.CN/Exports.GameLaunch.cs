@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Hi3Helper.Plugin.Core.Management.PresetConfig;
 using Hi3Helper.Plugin.Core.Utility;
 using Hi3Helper.Plugin.Endfield.CN.Management;
-using Hi3Helper.Plugin.Endfield.CN.Management.PresetConfig;
 using Microsoft.Extensions.Logging;
 
 namespace Hi3Helper.Plugin.Endfield.CN;
@@ -16,7 +15,7 @@ namespace Hi3Helper.Plugin.Endfield.CN;
 public partial class Exports
 {
     /// <summary>
-    /// 核心启动逻辑
+    ///     核心启动逻辑
     /// </summary>
     protected override (bool IsSupported, Task<bool> Task) LaunchGameFromGameManagerCoreAsync(
         GameManagerExtension.RunGameFromGameManagerContext context, string? startArgument, bool isRunBoosted,
@@ -45,14 +44,14 @@ public partial class Exports
                 _ = ReadGameLog(context, token);
 
                 await process.WaitForExitAsync(token);
-                
+
                 return true;
             }
         }
     }
 
     /// <summary>
-    /// 检测游戏是否正在运行
+    ///     检测游戏是否正在运行
     /// </summary>
     protected override bool IsGameRunningCore(GameManagerExtension.RunGameFromGameManagerContext context,
         out bool isGameRunning, out DateTime gameStartTime)
@@ -73,7 +72,7 @@ public partial class Exports
     }
 
     /// <summary>
-    /// 等待游戏运行
+    ///     等待游戏运行
     /// </summary>
     protected override (bool IsSupported, Task<bool> Task) WaitRunningGameCoreAsync(
         GameManagerExtension.RunGameFromGameManagerContext context, CancellationToken token)
@@ -93,7 +92,7 @@ public partial class Exports
     }
 
     /// <summary>
-    /// 强制关闭游戏
+    ///     强制关闭游戏
     /// </summary>
     protected override bool KillRunningGameCore(GameManagerExtension.RunGameFromGameManagerContext context,
         out bool wasGameRunning, out DateTime gameStartTime)
@@ -123,13 +122,11 @@ public partial class Exports
         Process? returnProcess = null;
 
         foreach (var process in processes)
-        {
             if (process.MainModule?.FileName.StartsWith(executableDirPath, StringComparison.OrdinalIgnoreCase) ?? false)
             {
                 returnProcess = process;
                 break;
             }
-        }
 
         foreach (var process in processes.Where(x => x != returnProcess)) process.Dispose();
 
@@ -166,7 +163,7 @@ public partial class Exports
         var startInfo = string.IsNullOrEmpty(startArgument)
             ? new ProcessStartInfo(startingExecutablePath)
             : new ProcessStartInfo(startingExecutablePath, startArgument);
-        
+
         startInfo.WorkingDirectory = Path.GetDirectoryName(startingExecutablePath);
         startInfo.UseShellExecute = true;
 
@@ -189,7 +186,7 @@ public partial class Exports
             return;
 
         var gameLogPath = Path.Combine(gameAppDataPath, gameLogFileName);
-        
+
         var retry = 5;
         while (!File.Exists(gameLogPath) && retry >= 0)
         {
@@ -201,18 +198,16 @@ public partial class Exports
 
         var printCallback = context.PrintGameLogCallback;
 
-        try 
+        try
         {
-            await using var fileStream = File.Open(gameLogPath, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite);
+            await using var fileStream =
+                File.Open(gameLogPath, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite);
             using var reader = new StreamReader(fileStream);
 
             fileStream.Position = 0;
             while (!token.IsCancellationRequested)
             {
-                while (await reader.ReadLineAsync(token) is { } line) 
-                {
-                    PassStringLineToCallback(printCallback, line);
-                }
+                while (await reader.ReadLineAsync(token) is { } line) PassStringLineToCallback(printCallback, line);
                 await Task.Delay(250, token);
             }
         }

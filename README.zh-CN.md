@@ -47,19 +47,19 @@
 1. **下载插件**
    前往 [Releases 页面](https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/releases/latest) 下载最新的插件压缩包（`.zip` 文件）。
 
-   ![Release Download Page](.github/assets/img.png)
+   ![Release Download Page](./.github/assets/img.png)
 
 2. **进入插件管理**
    打开启动器，进入 **设置 (Settings)** 页面，向下滚动找到并点击 `打开插件管理菜单`。
 
-   ![Settings Menu](.github/assets/img_2.png)
+   ![Settings Menu](./.github/assets/img_2.png)
 
 3. **添加并应用**
    在弹出的窗口中，点击 `点击添加 .zip 或 manifest.json` 按钮，选择刚刚下载的 `.zip` 文件。
 
    完成添加后，**重启启动器**即可生效。
 
-   ![Add Plugin Dialog](.github/assets/img_1.png)
+   ![Add Plugin Dialog](./.github/assets/img_1.png)
 
 ---
 

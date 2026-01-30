@@ -47,19 +47,19 @@ Before using this plugin, please ensure your Collapse Launcher version is `1.83.
 1. **Download the Plugin**
    Go to the [Releases Page](https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/releases/latest) and download the latest plugin archive (`.zip` file).
 
-   ![Release Download Page](.github/assets/img.png)
+   ![Release Download Page](./.github/assets/img.png)
 
 2. **Open Plugin Manager**
    Open the launcher, go to **Settings**, scroll down, and click on `Open Plugin Manager Menu`.
 
-   ![Settings Menu](.github/assets/img_2.png)
+   ![Settings Menu](./.github/assets/img_2.png)
 
 3. **Add and Restart**
    In the pop-up window, click the `Click to add .zip or manifest.json` button and select the `.zip` file you just downloaded.
 
    Once added, **restart the launcher** for the changes to take effect.
 
-   ![Add Plugin Dialog](.github/assets/img_1.png)
+   ![Add Plugin Dialog](./.github/assets/img_1.png)
 
 ---
 

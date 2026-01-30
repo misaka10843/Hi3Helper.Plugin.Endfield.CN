@@ -65,11 +65,11 @@ public partial class EndfieldPlugin : PluginBase
 
     public override void GetPluginAppIconUrl(out string result)
     {
-        result = Convert.ToBase64String(EndfieldImageData.AppIcon);
+        result = Convert.ToBase64String(EndfieldImageData.EndfieldAppIconData);
     }
 
     public override void GetNotificationPosterUrl(out string result)
     {
-        result = Convert.ToBase64String(EndfieldImageData.Poster);
+        result = Convert.ToBase64String(EndfieldImageData.EndfieldPosterData);
     }
 }

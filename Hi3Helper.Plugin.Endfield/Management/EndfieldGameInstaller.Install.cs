@@ -51,6 +51,7 @@ internal partial class EndfieldGameInstaller
 
             foreach (var pack in manager.GamePacks)
             {
+                if (string.IsNullOrEmpty(pack.Url)) continue;
                 if (long.TryParse(pack.PackageSize, out var size))
                     totalBytesToDownload += size;
 
@@ -265,7 +266,8 @@ internal partial class EndfieldGameInstaller
                     try
                     {
                         SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] 开始提取...");
-                        await archiveFile.ExtractAsync(entry => Path.Combine(destDir, entry.FileName), true, 1 << 20,
+                        await archiveFile.ExtractAsync(entry => Path.Combine(destDir, entry.FileName ?? string.Empty),
+                            true, 1 << 20,
                             token);
                     }
                     finally

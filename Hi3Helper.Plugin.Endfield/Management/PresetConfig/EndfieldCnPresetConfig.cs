@@ -38,7 +38,7 @@ public partial class EndfieldCnPresetConfig : PluginPresetConfigBase
         }
     }
 
-    [field: AllowNull] [field: MaybeNull] public override string GameLogFileName => field ??= null;
+    [field: AllowNull] [field: MaybeNull] public override string GameLogFileName => field ??= null!;
 
     [field: AllowNull] [field: MaybeNull] public override string GameVendorName => field ??= "Hypergryph";
     [field: AllowNull] [field: MaybeNull] public override string GameRegistryKeyName => field ??= "Endfield";

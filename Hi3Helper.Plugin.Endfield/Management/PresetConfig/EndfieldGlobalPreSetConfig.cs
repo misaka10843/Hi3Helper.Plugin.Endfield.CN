@@ -40,7 +40,7 @@ public partial class EndfieldGlobalPresetConfig : PluginPresetConfigBase
         }
     }
 
-    [field: AllowNull] [field: MaybeNull] public override string GameLogFileName => field ??= null;
+    [field: AllowNull] [field: MaybeNull] public override string GameLogFileName => field ??= null!;
     [field: AllowNull] [field: MaybeNull] public override string GameVendorName => field ??= "GRYPHLINE";
     [field: AllowNull] [field: MaybeNull] public override string GameRegistryKeyName => field ??= "Endfield";
 

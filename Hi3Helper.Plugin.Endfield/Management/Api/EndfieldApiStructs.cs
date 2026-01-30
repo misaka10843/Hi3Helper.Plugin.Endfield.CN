@@ -8,14 +8,14 @@ namespace Hi3Helper.Plugin.Endfield.Management.Api;
 // ==========================================
 public class EndfieldBatchRequest
 {
-    [JsonPropertyName("seq")] public string Seq { get; set; }
+    [JsonPropertyName("seq")] public string Seq { get; set; } = null!;
 
     [JsonPropertyName("proxy_reqs")] public List<EndfieldProxyRequest> ProxyReqs { get; set; } = new();
 }
 
 public class EndfieldProxyRequest
 {
-    [JsonPropertyName("kind")] public string Kind { get; set; }
+    [JsonPropertyName("kind")] public string Kind { get; set; } = null!;
 
     [JsonPropertyName("get_latest_game_req")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -33,7 +33,7 @@ public class EndfieldProxyRequest
     [JsonPropertyName("get_main_bg_image_req")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public EndfieldCommonReq? GetMainBgImageReq { get; set; }
-    
+
     [JsonPropertyName("get_sidebar_req")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public EndfieldCommonReq? GetSidebarReq { get; set; }
@@ -41,19 +41,19 @@ public class EndfieldProxyRequest
 
 public class EndfieldGetLatestGameReq
 {
-    [JsonPropertyName("appcode")] public string AppCode { get; set; }
-    [JsonPropertyName("channel")] public string Channel { get; set; }
-    [JsonPropertyName("sub_channel")] public string SubChannel { get; set; }
-    [JsonPropertyName("version")] public string Version { get; set; }
-    [JsonPropertyName("launcher_appcode")] public string LauncherAppCode { get; set; }
+    [JsonPropertyName("appcode")] public string AppCode { get; set; } = null!;
+    [JsonPropertyName("channel")] public string Channel { get; set; } = null!;
+    [JsonPropertyName("sub_channel")] public string SubChannel { get; set; } = null!;
+    [JsonPropertyName("version")] public string Version { get; set; } = null!;
+    [JsonPropertyName("launcher_appcode")] public string LauncherAppCode { get; set; } = null!;
 }
 
 public class EndfieldCommonReq
 {
-    [JsonPropertyName("appcode")] public string AppCode { get; set; }
+    [JsonPropertyName("appcode")] public string AppCode { get; set; } = null!;
     [JsonPropertyName("language")] public string Language { get; set; } = "zh-cn";
-    [JsonPropertyName("channel")] public string Channel { get; set; }
-    [JsonPropertyName("sub_channel")] public string SubChannel { get; set; }
+    [JsonPropertyName("channel")] public string Channel { get; set; } = null!;
+    [JsonPropertyName("sub_channel")] public string SubChannel { get; set; } = null!;
     [JsonPropertyName("platform")] public string Platform { get; set; } = "Windows";
     [JsonPropertyName("source")] public string Source { get; set; } = "launcher";
 }
@@ -80,9 +80,8 @@ public class EndfieldProxyResponse
 
     [JsonPropertyName("get_main_bg_image_rsp")]
     public EndfieldGetMainBgImageRsp? GetMainBgImageRsp { get; set; }
-    
-    [JsonPropertyName("get_sidebar_rsp")]
-    public EndfieldGetSidebarRsp? GetSidebarRsp { get; set; }
+
+    [JsonPropertyName("get_sidebar_rsp")] public EndfieldGetSidebarRsp? GetSidebarRsp { get; set; }
 }
 
 // --- 版本信息 ---

@@ -48,7 +48,7 @@ internal partial class EndfieldGameManager : GameManagerBase
 
     private string CurrentGameExecutableByPreset { get; }
 
-    protected override HttpClient? ApiResponseHttpClient { get; set; } = new();
+    protected override HttpClient ApiResponseHttpClient { get; set; } = new();
 
     protected override bool IsInstalled
     {
@@ -101,7 +101,7 @@ internal partial class EndfieldGameManager : GameManagerBase
         if (IsInstalled)
             try
             {
-                var configPath = Path.Combine(CurrentGameInstallPath, "config.ini");
+                var configPath = Path.Combine(CurrentGameInstallPath!, "config.ini");
                 if (File.Exists(configPath))
                 {
                     SharedStatic.InstanceLogger.LogWarning($"[Endfield] 发现配置文件: {configPath}");

@@ -46,10 +46,10 @@ jobs:
         run: dotnet restore Hi3Helper.Plugin.Endfield.sln
 
       - name: Build solution
-        run: dotnet build --configuration Release Hi3Helper.Plugin.Endfield.sln --no-restore
+        run: dotnet build --configuration Release Hi3Helper.Plugin.Endfield.sln --no-restore /p:Version=${{ inputs.version }}
 
       - name: Publish with selected profile
-        run: dotnet publish Hi3Helper.Plugin.Endfield/Hi3Helper.Plugin.Endfield.csproj --configuration Release --runtime win-x64 /p:PublishProfile=${{ inputs.publish_profile }} -o ./publish
+        run: dotnet publish Hi3Helper.Plugin.Endfield/Hi3Helper.Plugin.Endfield.csproj --configuration Release --runtime win-x64 /p:PublishProfile=${{ inputs.publish_profile }} /p:Version=${{ inputs.version }} -o ./publish
 
       - name: Generate build provenance
         uses: actions/attest-build-provenance@v3

@@ -221,7 +221,7 @@ internal partial class EndfieldGameInstaller
         private async Task ExtractPackagesAsync(string sourceDir, string destDir, CancellationToken token,
             Action<long, long>? progressCallback)
         {
-            SharedStatic.InstanceLogger.LogInformation($"[EndfieldInstaller] 准备解压 (虚拟合并流): {sourceDir} -> {destDir}");
+            SharedStatic.InstanceLogger.LogInformation($"[EndfieldInstaller] Preparing decompression (Virtual merge stream): {sourceDir} -> {destDir}");
 
             var partFiles = Directory.GetFiles(sourceDir)
                 .Where(f => f.EndsWith(".zip.001", StringComparison.OrdinalIgnoreCase) ||
@@ -238,11 +238,11 @@ internal partial class EndfieldGameInstaller
 
             if (partFiles.Count == 0)
             {
-                SharedStatic.InstanceLogger.LogError("[EndfieldInstaller] 未找到任何压缩包文件！");
+                SharedStatic.InstanceLogger.LogError("[EndfieldInstaller] No archive files found!");
                 throw new FileNotFoundException("No archive found in Downloads folder");
             }
 
-            SharedStatic.InstanceLogger.LogInformation($"[EndfieldInstaller] 找到 {partFiles.Count} 个分卷文件。");
+            SharedStatic.InstanceLogger.LogInformation($"[EndfieldInstaller] Found {partFiles.Count} split volume files.");
 
             await Task.Run(async () =>
             {
@@ -265,7 +265,7 @@ internal partial class EndfieldGameInstaller
                     archiveFile.ExtractProgress += ZipProgressAdapter;
                     try
                     {
-                        SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] 开始提取...");
+                        SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Starting extraction...");
                         await archiveFile.ExtractAsync(entry => Path.Combine(destDir, entry.FileName ?? string.Empty),
                             true, 1 << 20,
                             token);
@@ -275,11 +275,11 @@ internal partial class EndfieldGameInstaller
                         archiveFile.ExtractProgress -= ZipProgressAdapter;
                     }
 
-                    SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] 解压完成！");
+                    SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Decompression complete!");
                 }
                 catch (Exception ex)
                 {
-                    SharedStatic.InstanceLogger.LogError($"[EndfieldInstaller] 解压失败: {ex}");
+                    SharedStatic.InstanceLogger.LogError($"[EndfieldInstaller] Decompression failed: {ex}");
                     throw;
                 }
             }, token);

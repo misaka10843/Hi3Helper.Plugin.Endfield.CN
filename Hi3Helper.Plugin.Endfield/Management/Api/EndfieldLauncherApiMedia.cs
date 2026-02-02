@@ -88,6 +88,8 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
         var url = !string.IsNullOrEmpty(_bgResponse?.MainBgImage?.VideoUrl)
             ? _bgResponse?.MainBgImage?.VideoUrl
             : _bgResponse?.MainBgImage?.Url;
+        
+        SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Background image: {_bgResponse?.MainBgImage?.Url}, Background video: {_bgResponse?.MainBgImage?.VideoUrl}");
 
         if (string.IsNullOrEmpty(url))
         {

@@ -81,6 +81,8 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
             _newsResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_announcement")?.GetAnnouncementRsp;
             _bannerResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_banner")?.GetBannerRsp;
             _sidebarResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_sidebar")?.GetSidebarRsp;
+            
+            SharedStatic.InstanceLogger.LogDebug($"[EndfieldNews] Api content: {rspBody?.ProxyRsps}");
             return 0;
         }
         catch (Exception ex)

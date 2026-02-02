@@ -70,7 +70,7 @@ internal partial class EndfieldGameManager : GameManagerBase
 
     protected override void SetGamePathInner(string gamePath)
     {
-        SharedStatic.InstanceLogger.LogWarning($"[Endfield] SetGamePathInner 被调用! 传入路径: '{gamePath}'");
+        SharedStatic.InstanceLogger.LogInformation($"[Endfield] SetGamePathInner called! Input path: '{gamePath}'");
         CurrentGameInstallPath = gamePath;
 
         _latestGameInfo = null;
@@ -80,12 +80,12 @@ internal partial class EndfieldGameManager : GameManagerBase
             {
                 try
                 {
-                    SharedStatic.InstanceLogger.LogWarning("[Endfield] 路径已更新，触发重新初始化...");
+                    SharedStatic.InstanceLogger.LogInformation("[Endfield] Path updated, triggering re-initialization...");
                     await InitAsyncInner(true);
                 }
                 catch (Exception ex)
                 {
-                    SharedStatic.InstanceLogger.LogError($"[Endfield] 重新初始化失败: {ex}");
+                    SharedStatic.InstanceLogger.LogError($"[Endfield]Re-initialization failed: {ex}");
                 }
             });
     }
@@ -96,7 +96,7 @@ internal partial class EndfieldGameManager : GameManagerBase
 
         var requestVersion = "";
 
-        SharedStatic.InstanceLogger.LogWarning($"[Endfield] InitAsyncInner 开始运行. 当前路径: '{CurrentGameInstallPath}'");
+        SharedStatic.InstanceLogger.LogInformation($"[Endfield] InitAsyncInner started. Current path: '{CurrentGameInstallPath}'");
 
         if (IsInstalled)
             try
@@ -104,23 +104,23 @@ internal partial class EndfieldGameManager : GameManagerBase
                 var configPath = Path.Combine(CurrentGameInstallPath!, "config.ini");
                 if (File.Exists(configPath))
                 {
-                    SharedStatic.InstanceLogger.LogWarning($"[Endfield] 发现配置文件: {configPath}");
+                    SharedStatic.InstanceLogger.LogInformation($"[Endfield] Config file found: {configPath}");
                     var iniContent = ConfigTool.ReadConfig(configPath);
                     var ver = ConfigTool.ParseVersion(iniContent);
                     if (!string.IsNullOrEmpty(ver))
                     {
                         requestVersion = ver!;
                         CurrentGameVersion = new GameVersion(requestVersion);
-                        SharedStatic.InstanceLogger.LogWarning($"[Endfield] 成功读取本地版本: {requestVersion}");
+                        SharedStatic.InstanceLogger.LogInformation($"[Endfield] Successfully read local version: {requestVersion}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                SharedStatic.InstanceLogger.LogError($"[Endfield] 读取本地配置时发生异常: {ex}");
+                SharedStatic.InstanceLogger.LogError($"[Endfield] Exception occurred while reading local configuration: {ex}");
             }
         else
-            SharedStatic.InstanceLogger.LogWarning("[Endfield] 未检测到安装，留空版本");
+            SharedStatic.InstanceLogger.LogWarning("[Endfield] No installation detected; version set to empty.");
 
         var requestBody = new EndfieldBatchRequest
         {
@@ -155,12 +155,12 @@ internal partial class EndfieldGameManager : GameManagerBase
 
             if (_latestGameInfo == null)
             {
-                SharedStatic.InstanceLogger.LogError("[Endfield] API 返回数据异常: get_latest_game_rsp 为空");
+                SharedStatic.InstanceLogger.LogError("[Endfield] API data error: get_latest_game_rsp is null.");
                 return -1;
             }
 
-            SharedStatic.InstanceLogger.LogWarning(
-                $"[Endfield] API 响应 - Action: {_latestGameInfo.Action}, Version: {_latestGameInfo.Version}");
+            SharedStatic.InstanceLogger.LogInformation(
+                $"[Endfield] API Response - Action: {_latestGameInfo.Action}, Version: {_latestGameInfo.Version}");
 
             if (!string.IsNullOrEmpty(_latestGameInfo.Version))
                 ApiGameVersion = new GameVersion(_latestGameInfo.Version);
@@ -171,7 +171,7 @@ internal partial class EndfieldGameManager : GameManagerBase
         }
         catch (Exception ex)
         {
-            SharedStatic.InstanceLogger.LogError($"[Endfield] API 请求失败: {ex}");
+            SharedStatic.InstanceLogger.LogError($"[Endfield] API request failed: {ex}");
             return -1;
         }
 

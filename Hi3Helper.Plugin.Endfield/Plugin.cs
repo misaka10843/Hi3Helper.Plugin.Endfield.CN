@@ -48,7 +48,7 @@ public partial class EndfieldPlugin : PluginBase
 
     public override void GetPresetConfig(int index, out IPluginPresetConfig presetConfig)
     {
-        SharedStatic.InstanceLogger.LogInformation("[Endfield]开始运行");
+        SharedStatic.InstanceLogger.LogInformation("[Endfield] Starting execution...");
         if (index < 0 || index >= PresetConfigInstances.Length)
         {
             presetConfig = null!;

@@ -6,6 +6,8 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Runtime.InteropServices.Marshalling;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Hi3Helper.Plugin.Core;
@@ -65,14 +67,23 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
 
         try
         {
-            using var response = await ApiResponseHttpClient.PostAsJsonAsync(_webApiUrl, requestBody,
-                EndfieldApiContext.Default.EndfieldBatchRequest, token);
+            var jsonRequest = JsonSerializer.Serialize(requestBody, EndfieldApiContext.Default.EndfieldBatchRequest);
+            SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Request Body:\n{jsonRequest}");
+
+            using var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+            using var response = await ApiResponseHttpClient.PostAsync(_webApiUrl, content, token);
+
+            SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] API Response Code: {response.StatusCode}");
             response.EnsureSuccessStatusCode();
 
-            var rspBody =
-                await response.Content.ReadFromJsonAsync(EndfieldApiContext.Default.EndfieldBatchResponse, token);
-            _bgResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_main_bg_image")?.GetMainBgImageRsp;
+            var jsonResponse = await response.Content.ReadAsStringAsync(token);
+            SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Response Body:\n{jsonResponse}");
 
+            var rspBody = JsonSerializer.Deserialize(jsonResponse, EndfieldApiContext.Default.EndfieldBatchResponse);
+
+            _bgResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_main_bg_image")?.GetMainBgImageRsp;
+            SharedStatic.InstanceLogger.LogDebug(
+                $"[EndfieldMedia] Background URL: {_bgResponse?.MainBgImage?.Url}, Video: {_bgResponse?.MainBgImage?.VideoUrl}");
             return 0;
         }
         catch (Exception ex)
@@ -88,8 +99,9 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
         var url = !string.IsNullOrEmpty(_bgResponse?.MainBgImage?.VideoUrl)
             ? _bgResponse?.MainBgImage?.VideoUrl
             : _bgResponse?.MainBgImage?.Url;
-        
-        SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Background image: {_bgResponse?.MainBgImage?.Url}, Background video: {_bgResponse?.MainBgImage?.VideoUrl}");
+
+        SharedStatic.InstanceLogger.LogDebug(
+            $"[EndfieldMedia] Background image: {_bgResponse?.MainBgImage?.Url}, Background video: {_bgResponse?.MainBgImage?.VideoUrl}");
 
         if (string.IsNullOrEmpty(url))
         {
@@ -140,8 +152,18 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
         PluginDisposableMemory<byte> fileChecksum, PluginFiles.FileReadProgressDelegate? downloadProgress,
         CancellationToken token)
     {
-        await base.DownloadAssetAsyncInner(ApiDownloadHttpClient, fileUrl, outputStream, fileChecksum, downloadProgress,
-            token);
+        SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Downloading background: {fileUrl}");
+        try
+        {
+            await base.DownloadAssetAsyncInner(ApiDownloadHttpClient, fileUrl, outputStream, fileChecksum,
+                downloadProgress, token);
+            SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Background download COMPLETED.");
+        }
+        catch (Exception ex)
+        {
+            SharedStatic.InstanceLogger.LogError(
+                $"[EndfieldMedia] Background download FAILED: {fileUrl}\nException: {ex}");
+        }
     }
 
     public override void Dispose()

@@ -4,8 +4,7 @@ namespace Hi3Helper.Plugin.Endfield.Management.Api;
 
 [JsonSourceGenerationOptions(
     WriteIndented = false,
-    PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower,
-    GenerationMode = JsonSourceGenerationMode.Metadata)]
+    PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
 [JsonSerializable(typeof(EndfieldBatchRequest))]
 [JsonSerializable(typeof(EndfieldBatchResponse))]
 public partial class EndfieldApiContext : JsonSerializerContext

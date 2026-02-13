@@ -8,13 +8,21 @@
 
 [English](./README.md) · **简体中文**
 
-为 [Collapse Launcher (Collapse 启动器)](https://collapselauncher.com/) 开发的第三方插件，旨在支持 **《明日方舟：终末地》** 的下载、更新与启动。
+为 [Collapse Launcher (Collapse 启动器)](https://collapselauncher.com/) 开发的第三方插件，旨在支持 **《明日方舟：终末地》**
+的下载、更新与启动。
 
 当前插件核心功能已就绪，可正常用于日常游戏启动与管理。
 
 <img width="80%" alt="Plugin Preview" src="https://github.com/user-attachments/assets/f3f572c0-bfb7-4436-b8e7-47765f42c052" />
 
 </div>
+
+<p align="center">
+  <a href="https://github.com/palmcivet/awesome-arknights-endfield"><img src="https://github.com/palmcivet/awesome-arknights-endfield/blob/main/assets/badge-for-the-badge.svg" alt="Awesome Arknights Endfield badge" /></a>
+  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/graphs/contributors" target="_blank"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/misaka10843/Hi3Helper.Plugin.Endfield?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/stargazers" target="_blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/misaka10843/Hi3Helper.Plugin.Endfield?style=for-the-badge&label=%E2%AD%90STAR"></a>
+</p>
+
 
 ---
 
@@ -31,6 +39,7 @@
 ## ✨ 功能特性
 
 ### ✅ 当前已支持
+
 - **版本检测**：自动检测客户端版本是否为最新。
 - **资讯获取**：自动拉取并展示官方背景图、Banner 以及最新新闻公告。
 - **游戏管理**：支持完整的游戏下载、安装、启动及运行检测。
@@ -40,6 +49,7 @@
     - [x] Bilibili服 (Bili)
 
 ### 🚧 开发计划 / 待办事项 (ToDo)
+
 - [ ] **游戏更新**：待游戏正式版本（1.0.14+）发布后进行测试与适配。
 - [ ] **预下载支持**：需等待官方启动器实装相关接口。
 - [ ] **完整性校验**：目前Collapse启动器似乎暂未提供相关 API 接口，需等待上游更新。
@@ -55,7 +65,8 @@
 ### 安装步骤
 
 1. **下载插件**
-   前往 [Releases 页面](https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/releases/latest) 下载最新的插件压缩包（`.zip` 文件）。
+   前往 [Releases 页面](https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/releases/latest) 下载最新的插件压缩包（
+   `.zip` 文件）。
 
    ![Release Download Page](./.github/assets/img.png)
 
@@ -74,4 +85,5 @@
 ---
 
 ## ⚠️ 免责声明
+
 本项目是第三方开源插件，与 *GRYPHLINE* 或 *Hypergryph* 无关。

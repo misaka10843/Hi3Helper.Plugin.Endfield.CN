@@ -33,14 +33,8 @@ The core functionality is currently ready for daily game management and launchin
 > Since there is no official plugin documentation for Collapse Launcher, this project is based on existing plugins, \*
 > \*and may have the following limitations\*\*:
 >
-> 1. **Pre-download**: The official launcher has not yet enabled pre-download functionality, so the corresponding data
-
-     structure is currently unknown.
-
-> 2. **Integrity Check**: Game integrity checks will not be implemented for now (as this would require
-
-     reverse-engineering the official launcher).
-
+> 1. **Pre-download**: The official launcher has not yet enabled pre-download functionality, so the corresponding data structure is currently unknown.
+> 2. **Integrity Check**: Game integrity checks will not be implemented for now (as this would require reverse-engineering the official launcher).
 > 3. **Update Risk**: The game update function may have issues (currently untested).
 >    **It is highly recommended to backup your game directory before updating to prevent potential data loss.**
 

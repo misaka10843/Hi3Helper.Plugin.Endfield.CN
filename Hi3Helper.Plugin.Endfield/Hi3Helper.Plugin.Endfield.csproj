@@ -18,9 +18,13 @@
     <Company>Misaka10843</Company>
     <Authors>$(Company).</Authors>
     <Copyright>Copyright 2026 $(Company)</Copyright>
-    <Version>0.1.3</Version>
+    <Version>0.1.4</Version>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <Configurations>Debug;Release</Configurations>
+    <Title>Hi3Helper.Plugin.Endfield</Title>
+    <PackageProjectUrl>https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/releases</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/blob/main/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/misaka10843/Hi3Helper.Plugin.Endfield</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

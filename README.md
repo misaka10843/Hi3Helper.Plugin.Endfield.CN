@@ -46,7 +46,7 @@ The core functionality is currently ready for daily game management and launchin
 - **Version Detection**: Automatically checks if the game client is up to date.
 - **Media Integration**: Fetches official background images, banners, and the latest news/announcements.
 - **Game Management**: Supports full game download, installation, launching, and running process detection.
-- **Game Update**: Supports update game (Note: For the v1.0.14 update, Endfield indeed requires a 35GB download—this is consistent with the official launcher and is not a plugin bug).
+- **Game Update**: Supports update game (Note: For the v1.0.14 update, Endfield requires a 38GB download—this matches the official launcher's behavior and is not an issue with this plugin).
 - **Server Support**:
   - [x] CN Server
   - [x] Global Server
@@ -60,6 +60,7 @@ The core functionality is currently ready for daily game management and launchin
       updates.
 - [ ] **Social Media Panel**: Integration of official social media feeds. (Functionality is implemented, but temporarily
       disabled as icons cannot be retrieved via API).
+- [ ] **Delta/Incremental Updates**: Waiting for the official launcher to support Delta/Incremental updates. Implementation will begin once the official support is available.
 
 ---
 

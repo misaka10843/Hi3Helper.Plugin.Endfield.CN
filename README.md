@@ -35,8 +35,9 @@ The core functionality is currently ready for daily game management and launchin
 >
 > 1. **Pre-download**: The official launcher has not yet enabled pre-download functionality, so the corresponding data structure is currently unknown.
 > 2. **Integrity Check**: Game integrity checks will not be implemented for now (as this would require reverse-engineering the official launcher).
-> 3. **Update Risk**: The game update function may have issues (currently untested).
->    **It is highly recommended to backup your game directory before updating to prevent potential data loss.**
+> 3. **Update Risk**: Issues may exist within the game update functionality (the official launcher currently appears to utilize full-package updates rather than incremental/delta updates).
+
+**It is highly recommended to back up your game directory before updating to prevent file corruption due to update errors.**
 
 ## ✨ Features
 
@@ -45,6 +46,7 @@ The core functionality is currently ready for daily game management and launchin
 - **Version Detection**: Automatically checks if the game client is up to date.
 - **Media Integration**: Fetches official background images, banners, and the latest news/announcements.
 - **Game Management**: Supports full game download, installation, launching, and running process detection.
+- **Game Update**: Supports update game (Note: For the v1.0.14 update, Endfield indeed requires a 35GB download—this is consistent with the official launcher and is not a plugin bug).
 - **Server Support**:
   - [x] CN Server
   - [x] Global Server
@@ -52,7 +54,7 @@ The core functionality is currently ready for daily game management and launchin
 
 ### 🚧 Roadmap / To-Do
 
-- [ ] **Game Update**: To be tested and adapted once the official game version (1.0.14+) is released.
+- [x] **Game Update**: To be tested and adapted once the official game version (1.0.14+) is released.
 - [ ] **Pre-download Support**: Waiting for the official Launcher to implement the relevant interfaces.
 - [ ] **Integrity Check**: Collapse Launcher does not currently provide the relevant API endpoints; waiting for upstream
       updates.

@@ -140,7 +140,14 @@ internal partial class EndfieldGameInstaller
                 progress.TotalBytesToDownload = totalBytes;
                 Report(InstallProgressState.Install);
             });
-            try { Directory.Delete(downloadDir, true); } catch { } // 删除下载包
+            try
+            {
+                Directory.Delete(downloadDir, true);
+            }
+            catch
+            {
+            } // 删除下载包
+
             progressStateDelegate?.Invoke(InstallProgressState.Completed);
         }
 
@@ -221,7 +228,8 @@ internal partial class EndfieldGameInstaller
         private async Task ExtractPackagesAsync(string sourceDir, string destDir, CancellationToken token,
             Action<long, long>? progressCallback)
         {
-            SharedStatic.InstanceLogger.LogInformation($"[EndfieldInstaller] Preparing decompression (Virtual merge stream): {sourceDir} -> {destDir}");
+            SharedStatic.InstanceLogger.LogInformation(
+                $"[EndfieldInstaller] Preparing decompression (Virtual merge stream): {sourceDir} -> {destDir}");
 
             var partFiles = Directory.GetFiles(sourceDir)
                 .Where(f => f.EndsWith(".zip.001", StringComparison.OrdinalIgnoreCase) ||
@@ -242,7 +250,8 @@ internal partial class EndfieldGameInstaller
                 throw new FileNotFoundException("No archive found in Downloads folder");
             }
 
-            SharedStatic.InstanceLogger.LogInformation($"[EndfieldInstaller] Found {partFiles.Count} split volume files.");
+            SharedStatic.InstanceLogger.LogInformation(
+                $"[EndfieldInstaller] Found {partFiles.Count} split volume files.");
 
             await Task.Run(async () =>
             {

@@ -80,7 +80,8 @@ internal partial class EndfieldGameManager : GameManagerBase
             {
                 try
                 {
-                    SharedStatic.InstanceLogger.LogInformation("[Endfield] Path updated, triggering re-initialization...");
+                    SharedStatic.InstanceLogger.LogInformation(
+                        "[Endfield] Path updated, triggering re-initialization...");
                     await InitAsyncInner(true);
                 }
                 catch (Exception ex)
@@ -96,7 +97,8 @@ internal partial class EndfieldGameManager : GameManagerBase
 
         var requestVersion = "";
 
-        SharedStatic.InstanceLogger.LogInformation($"[Endfield] InitAsyncInner started. Current path: '{CurrentGameInstallPath}'");
+        SharedStatic.InstanceLogger.LogInformation(
+            $"[Endfield] InitAsyncInner started. Current path: '{CurrentGameInstallPath}'");
 
         if (IsInstalled)
             try
@@ -111,13 +113,15 @@ internal partial class EndfieldGameManager : GameManagerBase
                     {
                         requestVersion = ver!;
                         CurrentGameVersion = new GameVersion(requestVersion);
-                        SharedStatic.InstanceLogger.LogInformation($"[Endfield] Successfully read local version: {requestVersion}");
+                        SharedStatic.InstanceLogger.LogInformation(
+                            $"[Endfield] Successfully read local version: {requestVersion}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                SharedStatic.InstanceLogger.LogError($"[Endfield] Exception occurred while reading local configuration: {ex}");
+                SharedStatic.InstanceLogger.LogError(
+                    $"[Endfield] Exception occurred while reading local configuration: {ex}");
             }
         else
             SharedStatic.InstanceLogger.LogWarning("[Endfield] No installation detected; version set to empty.");

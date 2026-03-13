@@ -6,8 +6,9 @@ using System.Linq;
 namespace Hi3Helper.Plugin.Endfield.Utils;
 
 /// <summary>
-///     将多个分卷文件模拟为一个连续的流，避免物理合并
-///     因为CollapseLauncher/SevenZipExtractor的库似乎只支持单个压缩包，所以只能进行模拟
+///     Simulates multiple split volumes as a single contiguous stream to avoid physical merging.
+///     This acts as a workaround for SevenZipExtractor (used in CollapseLauncher),
+///     which currently only supports single-file archives.
 /// </summary>
 public class MultiVolumeStream : Stream
 {

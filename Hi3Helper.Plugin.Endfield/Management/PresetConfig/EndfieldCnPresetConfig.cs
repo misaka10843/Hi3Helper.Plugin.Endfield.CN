@@ -15,7 +15,7 @@ namespace Hi3Helper.Plugin.Endfield.Management.PresetConfig;
 public partial class EndfieldCnPresetConfig : PluginPresetConfigBase
 {
     private const string ExEcutableName = "Endfield.exe";
- 
+
     private const string ExApiUrl = "https://launcher.hypergryph.com/api/proxy/batch_proxy";
     private const string ExWebApiUrl = "https://launcher.hypergryph.com/api/proxy/web/batch_proxy";
     private const string ExAppCode = "6LL0KJuqHBVz33WK";

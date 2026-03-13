@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Text.Json;
@@ -157,7 +156,7 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
         {
             await base.DownloadAssetAsyncInner(ApiDownloadHttpClient, fileUrl, outputStream, fileChecksum,
                 downloadProgress, token);
-            SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Background download COMPLETED.");
+            SharedStatic.InstanceLogger.LogDebug("[EndfieldMedia] Background download COMPLETED.");
         }
         catch (Exception ex)
         {

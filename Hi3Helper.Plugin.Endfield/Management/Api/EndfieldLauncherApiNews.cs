@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Text.Json;
@@ -114,12 +113,9 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
         foreach (var tab in _newsResponse.Tabs)
         {
             if (tab.Announcements == null) continue;
-            string tName = tab.TabName ?? "Info";
+            var tName = tab.TabName ?? "Info";
 
-            foreach (var item in tab.Announcements)
-            {
-                flatList.Add(new FlatNewsItem { Item = item, TypeName = tName });
-            }
+            foreach (var item in tab.Announcements) flatList.Add(new FlatNewsItem { Item = item, TypeName = tName });
         }
 
         if (flatList.Count == 0)
@@ -134,13 +130,13 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
         isDisposable = true;
         isAllocated = true;
         //Todo: i am unable to support all the languages. before the launcher allows custom tabs, this method can only be used temporarily for classification.
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             var flatItem = flatList[i];
             var item = flatItem.Item;
             // 资讯/新闻/News/Other
-            LauncherNewsEntryType type = LauncherNewsEntryType.Info;
-            string typeNameLower = flatItem.TypeName?.ToLowerInvariant() ?? "";
+            var type = LauncherNewsEntryType.Info;
+            var typeNameLower = flatItem.TypeName?.ToLowerInvariant() ?? "";
 
             // 公告 / Notice
             if (typeNameLower.Contains("公告") ||
@@ -148,22 +144,17 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
                 typeNameLower.Contains("announcement") ||
                 typeNameLower.Contains("お知らせ") ||
                 typeNameLower.Contains("공지"))
-            {
                 type = LauncherNewsEntryType.Notice;
-            }
             // 活动 / Event
             else if (typeNameLower.Contains("活动") ||
                      typeNameLower.Contains("活動") ||
                      typeNameLower.Contains("event") ||
                      typeNameLower.Contains("イベント") ||
                      typeNameLower.Contains("이벤트"))
-            {
                 type = LauncherNewsEntryType.Event;
-            }
 
-            string dateStr = DateTime.Now.ToString("yyyy-MM-dd");
-            if (!string.IsNullOrEmpty(item.StartTs) && long.TryParse(item.StartTs, out long ts))
-            {
+            var dateStr = DateTime.Now.ToString("yyyy-MM-dd");
+            if (!string.IsNullOrEmpty(item.StartTs) && long.TryParse(item.StartTs, out var ts))
                 try
                 {
                     dateStr = DateTimeOffset.FromUnixTimeMilliseconds(ts).ToLocalTime().ToString("yyyy-MM-dd");
@@ -171,10 +162,9 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
                 catch
                 {
                 }
-            }
 
-            string content = item.Content ?? "";
-            string jumpUrl = item.JumpUrl ?? "";
+            var content = item.Content ?? "";
+            var jumpUrl = item.JumpUrl ?? "";
 
             ref var entry = ref memory[i];
             entry.Write(content, null, jumpUrl, dateStr, type);
@@ -230,12 +220,12 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
             isDisposable = true;
             isAllocated = true;
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 var item = sidebars[i];
-                string iconUrl = item.Pic?.Url ?? "";
-                string description = item.Pic?.Description ?? "";
-                string jumpUrl = item.JumpUrl ?? "";
+                var iconUrl = item.Pic?.Url ?? "";
+                var description = item.Pic?.Description ?? "";
+                var jumpUrl = item.JumpUrl ?? "";
 
                 ref var entry = ref memory[i];
                 entry.WriteIcon(iconUrl);

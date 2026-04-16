@@ -3,6 +3,8 @@ name: Feature/Enhancement request
 description: Suggest an idea for new feature or changes.
 title: "[Request]: "
 labels: ['Enhancement']
+assignees: 
+  - misaka10843
 body:
     - type: markdown
       attributes:

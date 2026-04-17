@@ -50,6 +50,7 @@ internal partial class EndfieldGameManager : GameManagerBase
 
     internal string? PatchManifestUrl => _latestGameInfo?.Patch?.V2PatchInfoUrl;
     internal string? TargetVersion => _latestGameInfo?.Version;
+
     internal List<EndfieldPack>? GamePacks
     {
         get
@@ -89,7 +90,7 @@ internal partial class EndfieldGameManager : GameManagerBase
         {
             if (!IsInstalled) return false;
 
-            bool isVersionDifferent = !ApiGameVersion.Equals(CurrentGameVersion);
+            var isVersionDifferent = !ApiGameVersion.Equals(CurrentGameVersion);
             return isVersionDifferent || _latestGameInfo?.Action == 1;
         }
     }

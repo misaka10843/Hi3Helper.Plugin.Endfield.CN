@@ -7,6 +7,7 @@ namespace Hi3Helper.Plugin.Endfield.Management.Api;
     PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower)]
 [JsonSerializable(typeof(EndfieldBatchRequest))]
 [JsonSerializable(typeof(EndfieldBatchResponse))]
+[JsonSerializable(typeof(EndfieldPatchManifest))]
 public partial class EndfieldApiContext : JsonSerializerContext
 {
 }

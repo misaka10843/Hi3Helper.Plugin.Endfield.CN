@@ -44,7 +44,21 @@ internal partial class EndfieldGameManager : GameManagerBase
     internal string? GameResourceBaseUrl { get; set; }
     private bool IsInitialized { get; set; }
 
-    internal List<EndfieldPack>? GamePacks => _latestGameInfo?.Pkg?.Packs;
+    internal List<EndfieldPack>? GamePacks
+    {
+        get
+        {
+            // 如果本地已安装，且服务端下发了Patch，则优先返回增量分卷
+            if (IsInstalled && _latestGameInfo?.Patch?.Patches != null && _latestGameInfo.Patch.Patches.Count > 0)
+            {
+                SharedStatic.InstanceLogger.LogInformation("[Endfield] Delta update detected, exposing Patch packs.");
+                return _latestGameInfo.Patch.Patches;
+            }
+
+            SharedStatic.InstanceLogger.LogInformation("[Endfield] Full package exposed.");
+            return _latestGameInfo?.Pkg?.Packs;
+        }
+    }
 
     private string CurrentGameExecutableByPreset { get; }
 
@@ -68,7 +82,7 @@ internal partial class EndfieldGameManager : GameManagerBase
         get
         {
             if (!IsInstalled) return false;
-            
+
             bool isVersionDifferent = !ApiGameVersion.Equals(CurrentGameVersion);
 
             return isVersionDifferent || _latestGameInfo?.Action == 1;

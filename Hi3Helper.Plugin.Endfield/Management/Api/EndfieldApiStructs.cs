@@ -90,6 +90,48 @@ public class EndfieldGetLatestGameRsp
     [JsonPropertyName("action")] public int Action { get; set; }
     [JsonPropertyName("version")] public string? Version { get; set; }
     [JsonPropertyName("pkg")] public EndfieldPkgInfo? Pkg { get; set; }
+    [JsonPropertyName("patch")] public EndfieldPatchInfo? Patch { get; set; }
+}
+
+// --- 增量更新 ---
+public class EndfieldPatchInfo
+{
+    [JsonPropertyName("url")] public string? Url { get; set; }
+    [JsonPropertyName("md5")] public string? Md5 { get; set; }
+    [JsonPropertyName("package_size")] public string? PackageSize { get; set; }
+    [JsonPropertyName("total_size")] public string? TotalSize { get; set; }
+    [JsonPropertyName("patches")] public List<EndfieldPack>? Patches { get; set; }
+
+    [JsonPropertyName("v2_patch_info_url")]
+    public string? V2PatchInfoUrl { get; set; }
+
+    [JsonPropertyName("v2_patch_info_md5")]
+    public string? V2PatchInfoMd5 { get; set; }
+}
+
+public class EndfieldPatchManifest
+{
+    [JsonPropertyName("version")] public string? Version { get; set; }
+    [JsonPropertyName("vfs_base_path")] public string? VfsBasePath { get; set; }
+    [JsonPropertyName("files")] public List<EndfieldPatchFile>? Files { get; set; }
+}
+
+// --- 增量更新内容 ---
+public class EndfieldPatchFile
+{
+    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("md5")] public string? Md5 { get; set; }
+    [JsonPropertyName("size")] public long Size { get; set; }
+    [JsonPropertyName("diffType")] public int DiffType { get; set; }
+    [JsonPropertyName("local_path")] public string? LocalPath { get; set; }
+    [JsonPropertyName("patch")] public List<EndfieldPatchNode>? Patches { get; set; }
+}
+
+public class EndfieldPatchNode
+{
+    [JsonPropertyName("base_file")] public string? BaseFile { get; set; }
+    [JsonPropertyName("base_md5")] public string? BaseMd5 { get; set; }
+    [JsonPropertyName("patch")] public string? PatchPath { get; set; }
 }
 
 public class EndfieldPkgInfo

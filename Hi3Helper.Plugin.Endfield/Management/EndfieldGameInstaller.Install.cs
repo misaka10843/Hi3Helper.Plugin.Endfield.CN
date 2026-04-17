@@ -57,7 +57,7 @@ internal partial class EndfieldGameInstaller
                 progressStateDelegate?.Invoke(state);
             }
 
-            Report(InstallProgressState.Verify);
+            Report(InstallProgressState.Preparing);
             SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Verifying existing packages...");
 
             var packsToDownload = new ConcurrentBag<EndfieldPack>();
@@ -67,6 +67,14 @@ internal partial class EndfieldGameInstaller
             foreach (var pack in manager.GamePacks)
                 if (long.TryParse(pack.PackageSize, out var s))
                     totalBytesToDownload += s;
+
+            progress.TotalCountToDownload = manager.GamePacks.Count;
+            progress.DownloadedCount = 0;
+            progress.TotalBytesToDownload = totalBytesToDownload;
+            progress.DownloadedBytes = 0;
+            progress.TotalStateToComplete = manager.GamePacks.Count;
+            progress.StateCount = 0;
+            Report(InstallProgressState.Verify);
 
             await Parallel.ForEachAsync(manager.GamePacks,
                 new ParallelOptions { MaxDegreeOfParallelism = 4, CancellationToken = token },
@@ -120,13 +128,20 @@ internal partial class EndfieldGameInstaller
 
                         packsToDownload.Add(pack);
                     }
+
+                    Interlocked.Add(ref progress.DownloadedBytes, size);
+                    Interlocked.Increment(ref progress.DownloadedCount);
+                    Interlocked.Increment(ref progress.StateCount);
+                    Report(InstallProgressState.Verify);
                 });
 
             var downloadTasks = packsToDownload.ToList();
             progress.TotalCountToDownload = downloadTasks.Count;
+            progress.DownloadedCount = 0;
             progress.TotalBytesToDownload = totalBytesToDownload;
             progress.DownloadedBytes = alreadyDownloadedBytes;
-            progress.TotalStateToComplete = downloadTasks.Count + 1;
+            progress.TotalStateToComplete = downloadTasks.Count;
+            progress.StateCount = 0;
 
             //断点续传下载
             if (downloadTasks.Count > 0)
@@ -176,6 +191,7 @@ internal partial class EndfieldGameInstaller
 
                     Interlocked.Increment(ref progress.DownloadedCount);
                     Interlocked.Increment(ref progress.StateCount);
+                    Report(InstallProgressState.Download);
                 });
             }
 

@@ -116,10 +116,16 @@ internal class EndfieldGameRepairer
 
         if (manifestNodes.Count == 0) return;
 
+        var totalVerifyBytes = manifestNodes.Sum(n => n.Size);
         SharedStatic.InstanceLogger.LogInformation(
             $"[EndfieldRepairer] Verifying {manifestNodes.Count} local files...");
+
         progress.TotalCountToDownload = manifestNodes.Count;
         progress.DownloadedCount = 0;
+        progress.TotalBytesToDownload = totalVerifyBytes;
+        progress.DownloadedBytes = 0;
+        progress.TotalStateToComplete = manifestNodes.Count;
+        progress.StateCount = 0;
         Report(InstallProgressState.Verify);
 
         var brokenFiles = new ConcurrentBag<EndfieldManifestNode>();
@@ -143,7 +149,9 @@ internal class EndfieldGameRepairer
                     Interlocked.Add(ref brokenSize, node.Size);
                 }
 
+                Interlocked.Add(ref progress.DownloadedBytes, node.Size);
                 Interlocked.Increment(ref progress.DownloadedCount);
+                Interlocked.Increment(ref progress.StateCount);
                 Report(InstallProgressState.Verify);
             });
 
@@ -159,9 +167,9 @@ internal class EndfieldGameRepairer
         SharedStatic.InstanceLogger.LogInformation(
             $"[EndfieldRepairer] Found {downloadList.Count} missing/corrupted files. Initiating repair...");
         progress.TotalCountToDownload = downloadList.Count;
+        progress.DownloadedCount = 0;
         progress.TotalBytesToDownload = brokenSize;
         progress.DownloadedBytes = 0;
-        progress.DownloadedCount = 0;
         progress.TotalStateToComplete = downloadList.Count;
         progress.StateCount = 0;
         Report(InstallProgressState.Download);
@@ -269,7 +277,7 @@ internal class EndfieldGameRepairer
     {
         if (!File.Exists(filePath)) return false;
         using var md5 = MD5.Create();
-        using var stream = File.OpenRead(filePath);
+        await using var stream = File.OpenRead(filePath);
         var hashBytes = await md5.ComputeHashAsync(stream, token);
         return BitConverter.ToString(hashBytes).Replace("-", "")
             .Equals(expectedMd5, StringComparison.OrdinalIgnoreCase);

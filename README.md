@@ -29,13 +29,13 @@ The core functionality is currently ready for daily game management and launchin
 
 > [!WARNING]
 > **Important Notes & Limitations**
->
-> Since there is no official plugin documentation for Collapse Launcher, this project is based on existing plugins, \*
-> \*and may have the following limitations\*\*:
+> 
+> Since there is no official plugin documentation for Collapse Launcher, this project is based on existing plugins,
+> **and may have the following limitations**:
 >
 > 1. **Pre-download**: The official launcher has not yet enabled pre-download functionality, so the corresponding data structure is currently unknown.
-> 2. **Integrity Check**: Game integrity checks will not be implemented for now (as this would require reverse-engineering the official launcher).
-> 3. **Update Risk**: Issues may exist within the game update functionality (the official launcher currently appears to utilize full-package updates rather than incremental/delta updates).
+> 2. **manual Integrity Check**: Collapse Launcher does not currently provide the relevant API endpoints; waiting for upstream
+     updates.
 
 **It is highly recommended to back up your game directory before updating to prevent file corruption due to update errors.**
 
@@ -46,21 +46,22 @@ The core functionality is currently ready for daily game management and launchin
 - **Version Detection**: Automatically checks if the game client is up to date.
 - **Media Integration**: Fetches official background images, banners, and the latest news/announcements.
 - **Game Management**: Supports full game download, installation, launching, and running process detection.
-- **Game Update**: Supports update game (Note: For the v1.0.14 update, Endfield requires a 38GB download—this matches the official launcher's behavior and is not an issue with this plugin).
+- **Game Update**: Supports update game.
 - **Server Support**:
   - [x] CN Server
   - [x] Global Server
   - [x] Bilibili Server
+- **Delta Game Updates (Beta)**: This feature is currently in beta. It may lead to update failures, error messages, or game file corruption.
+- **Integrity Verification**: Automatic integrity checks and game repair are performed after updates.
 
 ### 🚧 Roadmap / To-Do
 
-- [x] **Game Update**: To be tested and adapted once the official game version (1.0.14+) is released.
 - [ ] **Pre-download Support**: Waiting for the official Launcher to implement the relevant interfaces.
-- [ ] **Integrity Check**: Collapse Launcher does not currently provide the relevant API endpoints; waiting for upstream
+- [ ] **manual Integrity Check**: Collapse Launcher does not currently provide the relevant API endpoints; waiting for upstream
       updates.
 - [ ] **Social Media Panel**: Integration of official social media feeds. (Functionality is implemented, but temporarily
       disabled as icons cannot be retrieved via API).
-- [ ] **Delta/Incremental Updates**: Waiting for the official launcher to support Delta/Incremental updates. Implementation will begin once the official support is available.
+- [x] **Delta/Incremental Updates**: Waiting for the official launcher to support Delta/Incremental updates. Implementation will begin once the official support is available.
 
 ---
 

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hi3Helper.Plugin.Endfield",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SevenZipExtractor", "SevenZipExtractor\SevenZipExtractor\SevenZipExtractor.csproj", "{2F94B840-190E-4E17-8603-B76F0124446B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpHDiffPatch.Core", "SharpHDiffPatch.Core\SharpHDiffPatch.Core.csproj", "{57CB7A6D-2474-4A01-BE1A-5D1488F81390}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

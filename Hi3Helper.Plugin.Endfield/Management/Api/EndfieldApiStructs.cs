@@ -215,3 +215,11 @@ public class EndfieldSidebarLabel
     [JsonPropertyName("content")] public string? Content { get; set; }
     [JsonPropertyName("jump_url")] public string? JumpUrl { get; set; }
 }
+
+// --- 游戏完整性校验节点 ---
+public class EndfieldManifestNode
+{
+    [JsonPropertyName("path")] public string? Path { get; set; }
+    [JsonPropertyName("md5")] public string? Md5 { get; set; }
+    [JsonPropertyName("size")] public long Size { get; set; }
+}

@@ -44,18 +44,25 @@ internal partial class EndfieldGameManager : GameManagerBase
     internal string? GameResourceBaseUrl { get; set; }
     private bool IsInitialized { get; set; }
 
+    internal bool IsDeltaUpdate => IsInstalled
+                                   && _latestGameInfo?.Patch?.Patches != null
+                                   && _latestGameInfo.Patch.Patches.Count > 0;
+
+    internal string? PatchManifestUrl => _latestGameInfo?.Patch?.V2PatchInfoUrl;
+    internal string? TargetVersion => _latestGameInfo?.Version;
+
     internal List<EndfieldPack>? GamePacks
     {
         get
         {
-            // 如果本地已安装，且服务端下发了Patch，则优先返回增量分卷
-            if (IsInstalled && _latestGameInfo?.Patch?.Patches != null && _latestGameInfo.Patch.Patches.Count > 0)
+            if (IsDeltaUpdate)
             {
-                SharedStatic.InstanceLogger.LogInformation("[Endfield] Delta update detected, exposing Patch packs.");
-                return _latestGameInfo.Patch.Patches;
+                SharedStatic.InstanceLogger.LogInformation(
+                    "[Endfield] Delta update detected, exposing Patch packs.");
+                return _latestGameInfo!.Patch!.Patches;
             }
 
-            SharedStatic.InstanceLogger.LogInformation("[Endfield] Full package exposed.");
+            SharedStatic.InstanceLogger.LogInformation("[Endfield] Full package detected.");
             return _latestGameInfo?.Pkg?.Packs;
         }
     }
@@ -83,8 +90,7 @@ internal partial class EndfieldGameManager : GameManagerBase
         {
             if (!IsInstalled) return false;
 
-            bool isVersionDifferent = !ApiGameVersion.Equals(CurrentGameVersion);
-
+            var isVersionDifferent = !ApiGameVersion.Equals(CurrentGameVersion);
             return isVersionDifferent || _latestGameInfo?.Action == 1;
         }
     }

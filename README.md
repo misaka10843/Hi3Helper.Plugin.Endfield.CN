@@ -30,6 +30,8 @@ The core functionality is currently ready for daily game management and launchin
 > [!WARNING]
 > **Important Notes & Limitations**
 >
+> Delta Updates is currently in beta. It may lead to update failures, error messages, or game file corruption. Please back up your game files before proceeding with the update.
+> 
 > Since there is no official plugin documentation for Collapse Launcher, this project is based on existing plugins, \*
 > \*and may have the following limitations\*\*:
 >
@@ -51,6 +53,7 @@ The core functionality is currently ready for daily game management and launchin
   - [x] CN Server
   - [x] Global Server
   - [x] Bilibili Server
+- Delta Game Updates (Beta): This feature is currently in beta. It may lead to update failures, error messages, or game file corruption. Please back up your game files before proceeding with the update.
 
 ### 🚧 Roadmap / To-Do
 
@@ -60,7 +63,7 @@ The core functionality is currently ready for daily game management and launchin
       updates.
 - [ ] **Social Media Panel**: Integration of official social media feeds. (Functionality is implemented, but temporarily
       disabled as icons cannot be retrieved via API).
-- [ ] **Delta/Incremental Updates**: Waiting for the official launcher to support Delta/Incremental updates. Implementation will begin once the official support is available.
+- [x] **Delta/Incremental Updates**: Waiting for the official launcher to support Delta/Incremental updates. Implementation will begin once the official support is available.
 
 ---
 

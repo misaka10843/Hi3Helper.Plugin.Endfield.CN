@@ -171,8 +171,6 @@ namespace SharpHDiffPatch.Core.Patch
             long lastOldPosBack = 0,
                 lastNewPosBack = 0;
 
-            // ===== 核心修复：增加 coverSize > 0 判断 =====
-            // 如果是 SF20 格式，coverSize 为 0，必须走流式解析防止越界
             if (coverSize > 0 && coverSize < MaxMemBufferLen)
             {
                 HDiffPatch.Event.PushLog(
@@ -363,14 +361,17 @@ namespace SharpHDiffPatch.Core.Patch
                 int actuallyRead = input.Read(sharedBuffer, 0, toRead);
                 if (actuallyRead == 0)
                 {
-                    HDiffPatch.Event.PushLog($"[PatchCore::TBytesCopyStreamInner] Reached EOF early. Missing {readLen} bytes.", Verbosity.Debug);
+                    HDiffPatch.Event.PushLog(
+                        $"[PatchCore::TBytesCopyStreamInner] Reached EOF early. Missing {readLen} bytes.",
+                        Verbosity.Debug);
                     break;
                 }
-                
+
                 output.Write(sharedBuffer, 0, actuallyRead);
                 readLen -= actuallyRead;
             }
         }
+
         private static void TBytesDetermineRleType(ref RleRefClipStruct rleLoader, MemoryStream outCache,
             long copyLength, byte[] sharedBuffer,
             Stream rleCtrlStream, Stream rleCodeStream)
@@ -379,7 +380,16 @@ namespace SharpHDiffPatch.Core.Patch
 
             while (copyLength > 0)
             {
-                byte pSign = (byte)rleCtrlStream.ReadByte();
+                int signInt = rleCtrlStream.ReadByte();
+                if (signInt == -1)
+                {
+                    HDiffPatch.Event.PushLog(
+                        $"[PatchCore::TBytesDetermineRleType] RLE Control Stream reached EOF early. Remaining copyLength: {copyLength}",
+                        Verbosity.Debug);
+                    break;
+                }
+
+                byte pSign = (byte)signInt;
                 byte type = (byte)(pSign >> (8 - KByteRleType));
                 long length = rleCtrlStream.ReadLong7Bit(KByteRleType, pSign);
                 ++length;
@@ -403,9 +413,9 @@ namespace SharpHDiffPatch.Core.Patch
                  * we cast it to byte, then it underflow and set it to 255.
                  * This method is the same as:
                  * if (type == 0)
-                 *     rleLoader.memSetValue = 0x00; // or 0 in byte
+                 * rleLoader.memSetValue = 0x00; // or 0 in byte
                  * else
-                 *     rleLoader.memSetValue = 0xFF; // or 255 in byte
+                 * rleLoader.memSetValue = 0xFF; // or 255 in byte
                  */
                 rleLoader.MemSetValue = (byte)(0x00 - type);
                 TBytesSetRle(ref rleLoader, outCache, ref copyLength, sharedBuffer, rleCodeStream);
@@ -421,13 +431,36 @@ namespace SharpHDiffPatch.Core.Patch
             int decodeStep = (int)(rleLoader.MemCopyLength > copyLength ? copyLength : rleLoader.MemCopyLength);
 
             long lastPosCopy = outCache.Position;
-            rleCodeStream.ReadExactly(sharedBuffer, 0, decodeStep);
-            outCache.ReadExactly(sharedBuffer, MaxArrayPoolSecondOffset, decodeStep);
+
+            int rleRead = 0;
+            while (rleRead < decodeStep)
+            {
+                int r = rleCodeStream.Read(sharedBuffer, rleRead, decodeStep - rleRead);
+                if (r == 0) break;
+                rleRead += r;
+            }
+
+            decodeStep = rleRead;
+
+            if (decodeStep == 0) return;
+
+            int outRead = 0;
+            while (outRead < decodeStep)
+            {
+                int r = outCache.Read(sharedBuffer, MaxArrayPoolSecondOffset + outRead, decodeStep - outRead);
+                if (r == 0) break;
+                outRead += r;
+            }
+
             outCache.Position = lastPosCopy;
 
-            fixed (byte* rlePtr = &sharedBuffer[0], oldPtr = &sharedBuffer[MaxArrayPoolSecondOffset])
+            if (decodeStep > 0)
             {
-                RleProcDelegate(ref rleLoader, outCache, ref copyLength, decodeStep, rlePtr, sharedBuffer, 0, oldPtr);
+                fixed (byte* rlePtr = &sharedBuffer[0], oldPtr = &sharedBuffer[MaxArrayPoolSecondOffset])
+                {
+                    RleProcDelegate(ref rleLoader, outCache, ref copyLength, decodeStep, rlePtr, sharedBuffer, 0,
+                        oldPtr);
+                }
             }
         }
 

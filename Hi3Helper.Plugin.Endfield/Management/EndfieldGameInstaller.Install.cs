@@ -174,14 +174,13 @@ internal partial class EndfieldGameInstaller
 
             if (manager.IsDeltaUpdate)
             {
-                SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Delta update mechanism confirmed.");
+                SharedStatic.InstanceLogger.LogInformation(
+                    "[EndfieldInstaller] Delta update mechanism confirmed. Initializing sandbox extraction...");
                 var tempExtractDir = Path.Combine(installPath, "_Endfield_DeltaTemp");
-
                 var skipExtractForDebug = false;
 #if DEBUG
                 skipExtractForDebug = true;
-# endif
-
+#endif
 
                 if (!skipExtractForDebug)
                 {
@@ -195,10 +194,40 @@ internal partial class EndfieldGameInstaller
                         Report(InstallProgressState.Install);
                     });
                 }
-                else
+
+                SharedStatic.InstanceLogger.LogInformation(
+                    "[EndfieldInstaller] Cleaning up legacy files and updating core components...");
+
+                var deleteListPath = Path.Combine(tempExtractDir, "delete_files.txt");
+                if (File.Exists(deleteListPath))
                 {
-                    SharedStatic.InstanceLogger.LogWarning(
-                        "[EndfieldInstaller] Debug mode enabled: Skipping extraction. Using existing _Endfield_DeltaTemp directory for patching.");
+                    SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Processing delete_files.txt...");
+                    var filesToDelete = File.ReadAllLines(deleteListPath);
+                    foreach (var fileLine in filesToDelete)
+                    {
+                        if (string.IsNullOrWhiteSpace(fileLine)) continue;
+                        var targetDeletePath = Path.Combine(installPath, fileLine.Trim().Replace("/", "\\"));
+                        if (File.Exists(targetDeletePath)) File.Delete(targetDeletePath);
+                    }
+                }
+
+                SharedStatic.InstanceLogger.LogInformation(
+                    "[EndfieldInstaller] Copying static update files...");
+                foreach (var newPath in Directory.GetFiles(tempExtractDir, "*.*", SearchOption.AllDirectories))
+                {
+                    var relPath = Path.GetRelativePath(tempExtractDir, newPath);
+
+                    if (relPath.StartsWith("vfs_files", StringComparison.OrdinalIgnoreCase) ||
+                        relPath.StartsWith("diff_", StringComparison.OrdinalIgnoreCase) ||
+                        relPath.Equals("patch.json", StringComparison.OrdinalIgnoreCase) ||
+                        relPath.Equals("delete_files.txt", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var destPath = Path.Combine(installPath, relPath);
+                    var destDir = Path.GetDirectoryName(destPath)!;
+                    if (!Directory.Exists(destDir)) Directory.CreateDirectory(destDir);
+
+                    File.Copy(newPath, destPath, true);
                 }
 
                 await ApplyDeltaPatchAsync(tempExtractDir, installPath, manager.PatchManifestUrl, token,
@@ -218,8 +247,6 @@ internal partial class EndfieldGameInstaller
                     catch
                     {
                     }
-                else
-                    SharedStatic.InstanceLogger.LogWarning("[EndfieldInstaller] [DEBUG] 调试模式已开启：跳过沙盒清理逻辑。");
             }
             else
             {
@@ -246,19 +273,32 @@ internal partial class EndfieldGameInstaller
                 if (File.Exists(configPath))
                     try
                     {
-                        var lines = File.ReadAllLines(configPath);
-                        for (var i = 0; i < lines.Length; i++)
-                            if (lines[i].StartsWith("version=", StringComparison.OrdinalIgnoreCase))
-                                lines[i] = $"version={manager.TargetVersion}";
+                        var decryptedConfig = ConfigTool.ReadConfig(configPath);
+                        if (!string.IsNullOrEmpty(decryptedConfig))
+                        {
+                            var lines = decryptedConfig.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                            var versionUpdated = false;
+                            for (var i = 0; i < lines.Length; i++)
+                                if (lines[i].Trim().StartsWith("version=", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    lines[i] = $"version={manager.TargetVersion}";
+                                    versionUpdated = true;
+                                    break;
+                                }
 
-                        File.WriteAllLines(configPath, lines);
-                        SharedStatic.InstanceLogger.LogInformation(
-                            $"[EndfieldInstaller] Successfully updated config.ini version to {manager.TargetVersion}");
+                            if (versionUpdated)
+                            {
+                                var newConfigContent = string.Join("\r\n", lines);
+                                EndfieldCrypto.EncryptStringToFile(newConfigContent, configPath);
+                                SharedStatic.InstanceLogger.LogInformation(
+                                    $"[EndfieldInstaller] Successfully updated encrypted config.ini version to {manager.TargetVersion}");
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
                         SharedStatic.InstanceLogger.LogError(
-                            $"[EndfieldInstaller] Failed to write config.ini: {ex.Message}");
+                            $"[EndfieldInstaller] Failed to update config.ini: {ex.Message}");
                     }
             }
 

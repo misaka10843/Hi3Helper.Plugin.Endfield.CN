@@ -61,4 +61,31 @@ public static class EndfieldCrypto
             return string.Empty;
         }
     }
+
+    /// <summary>
+    ///     Encrypts a UTF-8 string and writes it to a file.
+    ///     Used for saving modified config.ini back to the game folder.
+    /// </summary>
+    public static void EncryptStringToFile(string content, string filePath)
+    {
+        try
+        {
+            var contentBytes = Encoding.UTF8.GetBytes(content);
+
+            using var aes = Aes.Create();
+            aes.Key = AesKey;
+            aes.IV = AesIv;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+
+            using var encryptor = aes.CreateEncryptor();
+            var encryptedBytes = encryptor.TransformFinalBlock(contentBytes, 0, contentBytes.Length);
+
+            File.WriteAllBytes(filePath, encryptedBytes);
+        }
+        catch (Exception ex)
+        {
+            throw new CryptographicException($"Failed to encrypt and write to file: {filePath}", ex);
+        }
+    }
 }

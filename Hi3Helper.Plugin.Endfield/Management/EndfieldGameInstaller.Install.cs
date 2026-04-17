@@ -424,59 +424,91 @@ internal partial class EndfieldGameInstaller
         private async Task DownloadFileAsync(string url, string tempPath, long expectedSize, CancellationToken token,
             Action<long> onProgress)
         {
-            long existingLength = 0;
-            if (File.Exists(tempPath))
-            {
-                existingLength = new FileInfo(tempPath).Length;
-                if (existingLength > expectedSize)
-                {
-                    File.Delete(tempPath);
-                    existingLength = 0;
-                }
+            long totalReported = 0;
+            var maxRetries = 3;
 
-                if (existingLength == expectedSize)
+            for (var attempt = 1; attempt <= maxRetries; attempt++)
+                try
                 {
-                    onProgress(existingLength);
+                    long existingLength = 0;
+                    if (File.Exists(tempPath))
+                    {
+                        existingLength = new FileInfo(tempPath).Length;
+                        if (existingLength > expectedSize)
+                        {
+                            File.Delete(tempPath);
+                            existingLength = 0;
+                        }
+                    }
+
+                    var diff = existingLength - totalReported;
+                    if (diff != 0)
+                    {
+                        onProgress(diff);
+                        totalReported += diff;
+                    }
+
+                    if (existingLength == expectedSize) return;
+
+                    using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                    if (existingLength > 0)
+                        request.Headers.Range = new RangeHeaderValue(existingLength, null);
+
+                    using var response = await _owner._downloadHttpClient.SendAsync(request,
+                        HttpCompletionOption.ResponseHeadersRead, token);
+
+                    if (existingLength > 0 && response.StatusCode != HttpStatusCode.PartialContent)
+                    {
+                        existingLength = 0;
+                        if (File.Exists(tempPath)) File.Delete(tempPath);
+
+                        if (totalReported > 0)
+                        {
+                            onProgress(-totalReported);
+                            totalReported = 0;
+                        }
+                    }
+
+                    response.EnsureSuccessStatusCode();
+
+                    await using var stream = await response.Content.ReadAsStreamAsync(token);
+                    await using var fs = new FileStream(tempPath,
+                        existingLength > 0 ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 81920,
+                        true);
+
+                    var buffer = ArrayPool<byte>.Shared.Rent(81920);
+                    try
+                    {
+                        int read;
+                        while ((read = await stream.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
+                        {
+                            await fs.WriteAsync(buffer, 0, read, token);
+                            onProgress(read);
+                            totalReported += read;
+                        }
+                    }
+                    finally
+                    {
+                        ArrayPool<byte>.Shared.Return(buffer);
+                    }
+
+                    await fs.FlushAsync(token);
+                    var finalSize = fs.Length;
+
+                    if (finalSize != expectedSize)
+                        throw new Exception($"Size mismatch. Expected {expectedSize}, Got {finalSize}");
+
                     return;
                 }
-            }
-
-            if (existingLength > 0) onProgress(existingLength);
-
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            if (existingLength > 0)
-                request.Headers.Range = new RangeHeaderValue(existingLength, null);
-
-            using var response =
-                await _owner._downloadHttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
-
-            if (existingLength > 0 && response.StatusCode != HttpStatusCode.PartialContent)
-                if (File.Exists(tempPath))
-                    File.Delete(tempPath);
-
-            response.EnsureSuccessStatusCode();
-
-            await using var stream = await response.Content.ReadAsStreamAsync(token);
-            await using var fs = new FileStream(tempPath, existingLength > 0 ? FileMode.Append : FileMode.Create,
-                FileAccess.Write);
-
-            var buffer = ArrayPool<byte>.Shared.Rent(81920);
-            try
-            {
-                int read;
-                while ((read = await stream.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
+                catch (Exception ex)
                 {
-                    await fs.WriteAsync(buffer, 0, read, token);
-                    onProgress(read);
+                    if (attempt == maxRetries)
+                        throw new Exception(
+                            $"Download failed after {maxRetries} attempts for {url} | Error: {ex.Message}");
+                    SharedStatic.InstanceLogger.LogWarning(
+                        $"[EndfieldInstaller] Download interrupted, retrying ({attempt}/{maxRetries}) for {Path.GetFileName(url)}...");
+                    await Task.Delay(1000, token);
                 }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
-
-            if (new FileInfo(tempPath).Length != expectedSize)
-                throw new Exception($"Download incomplete for {url}");
         }
 
         private async Task<bool> CheckMd5Async(string filePath, string expectedMd5, CancellationToken token)

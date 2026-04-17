@@ -105,7 +105,12 @@ internal class EndfieldGameRepairer
                 try
                 {
                     var node = JsonSerializer.Deserialize(line, EndfieldApiContext.Default.EndfieldManifestNode);
-                    if (node != null && !string.IsNullOrEmpty(node.Path)) manifestNodes.Add(node);
+                    if (node != null && !string.IsNullOrEmpty(node.Path))
+                    {
+                        if (node.Path.Equals("config.ini", StringComparison.OrdinalIgnoreCase)) continue;
+
+                        manifestNodes.Add(node);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -165,7 +170,7 @@ internal class EndfieldGameRepairer
 
 
         SharedStatic.InstanceLogger.LogInformation(
-            $"[EndfieldRepairer] Found {downloadList.Count} missing/corrupted files. Initiating repair...");
+            $"[EndfieldRepairer] Found {downloadList.Count} missing/corrupted files. Initiating download...");
         progress.TotalCountToDownload = downloadList.Count;
         progress.DownloadedCount = 0;
         progress.TotalBytesToDownload = brokenSize;
@@ -189,22 +194,6 @@ internal class EndfieldGameRepairer
                     Report(InstallProgressState.Download);
                 });
 
-                var md5Match = await CheckMd5Async(tempPath, node.Md5!, innerToken);
-                if (!md5Match)
-                {
-                    try
-                    {
-                        File.Delete(tempPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedStatic.InstanceLogger.LogDebug(
-                            $"[EndfieldRepairer] Temp file delete failed: {ex.Message}");
-                    }
-
-                    throw new Exception($"[EndfieldRepairer] MD5 mismatch after downloading {node.Path}");
-                }
-
                 if (File.Exists(targetPath)) File.Delete(targetPath);
                 File.Move(tempPath, targetPath);
 
@@ -213,7 +202,46 @@ internal class EndfieldGameRepairer
                 Report(InstallProgressState.Download);
             });
 
-        SharedStatic.InstanceLogger.LogInformation("[EndfieldRepairer] Integrity restored completely!");
+        SharedStatic.InstanceLogger.LogInformation(
+            $"[EndfieldRepairer] Re-verifying {downloadList.Count} newly downloaded files...");
+
+        progress.TotalCountToDownload = downloadList.Count;
+        progress.DownloadedCount = 0;
+        progress.TotalBytesToDownload = brokenSize;
+        progress.DownloadedBytes = 0;
+        progress.TotalStateToComplete = downloadList.Count;
+        progress.StateCount = 0;
+        Report(InstallProgressState.Verify);
+
+        await Parallel.ForEachAsync(downloadList,
+            new ParallelOptions { MaxDegreeOfParallelism = 8, CancellationToken = token }, async (node, innerToken) =>
+            {
+                var targetPath = Path.Combine(_installPath, node.Path!.Replace("/", "\\"));
+
+                var md5Match = await CheckMd5Async(targetPath, node.Md5!, innerToken);
+                if (!md5Match)
+                {
+                    try
+                    {
+                        File.Delete(targetPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedStatic.InstanceLogger.LogDebug(
+                            $"[EndfieldRepairer] Target file delete failed: {ex.Message}");
+                    }
+
+                    throw new Exception($"[EndfieldRepairer] MD5 mismatch after downloading {node.Path}");
+                }
+
+                Interlocked.Add(ref progress.DownloadedBytes, node.Size);
+                Interlocked.Increment(ref progress.DownloadedCount);
+                Interlocked.Increment(ref progress.StateCount);
+                Report(InstallProgressState.Verify);
+            });
+
+        SharedStatic.InstanceLogger.LogInformation(
+            "[EndfieldRepairer] Integrity restored and double-verified completely!");
     }
 
     private async Task DownloadFileAsync(string url, string tempPath, long expectedSize, CancellationToken token,

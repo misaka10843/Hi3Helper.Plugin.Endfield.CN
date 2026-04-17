@@ -253,6 +253,11 @@ internal partial class EndfieldGameInstaller
                         relPath.Equals("patch.json", StringComparison.OrdinalIgnoreCase) ||
                         relPath.Equals("delete_files.txt", StringComparison.OrdinalIgnoreCase))
                         continue;
+                    if (relPath.Equals("config.ini", StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.Copy(newPath, Path.Combine(installPath, "config.ini.new"), true);
+                        continue;
+                    }
 
                     var destPath = Path.Combine(installPath, relPath);
                     var destDir = Path.GetDirectoryName(destPath)!;
@@ -308,6 +313,22 @@ internal partial class EndfieldGameInstaller
             {
                 var repairer = new EndfieldGameRepairer(_owner._downloadHttpClient, manager, installPath);
                 await repairer.StartRepairAsync(progressDelegate, progressStateDelegate, token);
+                var newConfigPath = Path.Combine(installPath, "config.ini.new");
+                var targetConfigPath = Path.Combine(installPath, "config.ini");
+                if (File.Exists(newConfigPath))
+                {
+                    File.Copy(newConfigPath, targetConfigPath, true);
+                    try
+                    {
+                        File.Delete(newConfigPath);
+                    }
+                    catch
+                    {
+                    }
+
+                    SharedStatic.InstanceLogger.LogInformation(
+                        "[EndfieldInstaller] config.ini successfully updated after full verification.");
+                }
             }
             catch (Exception ex)
             {

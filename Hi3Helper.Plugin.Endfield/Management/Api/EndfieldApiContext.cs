@@ -8,6 +8,7 @@ namespace Hi3Helper.Plugin.Endfield.Management.Api;
 [JsonSerializable(typeof(EndfieldBatchRequest))]
 [JsonSerializable(typeof(EndfieldBatchResponse))]
 [JsonSerializable(typeof(EndfieldPatchManifest))]
+[JsonSerializable(typeof(EndfieldManifestNode))]
 public partial class EndfieldApiContext : JsonSerializerContext
 {
 }

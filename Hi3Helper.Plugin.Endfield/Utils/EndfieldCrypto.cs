@@ -63,6 +63,33 @@ public static class EndfieldCrypto
     }
 
     /// <summary>
+    ///     Decrypts a raw byte array to a UTF-8 string.
+    ///     Used for in-memory decryption of CDN manifest files (game_files).
+    /// </summary>
+    public static string DecryptBytesToString(byte[] encryptedBytes)
+    {
+        try
+        {
+            if (encryptedBytes.Length == 0) return string.Empty;
+
+            using var aes = Aes.Create();
+            aes.Key = AesKey;
+            aes.IV = AesIv;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+
+            using var decryptor = aes.CreateDecryptor();
+            var decryptedBytes = decryptor.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
+
+            return Encoding.UTF8.GetString(decryptedBytes);
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
     ///     Encrypts a UTF-8 string and writes it to a file.
     ///     Used for saving modified config.ini back to the game folder.
     /// </summary>

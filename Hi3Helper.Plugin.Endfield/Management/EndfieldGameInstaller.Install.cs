@@ -36,6 +36,7 @@ internal partial class EndfieldGameInstaller
         public async Task RunAsync(GameInstallerKind kind, InstallProgressDelegate? progressDelegate,
             InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
         {
+            _ = kind;
             await _owner.InitAsync(token).ConfigureAwait(false);
 
             if (_owner.GameManager is not EndfieldGameManager manager || manager.GamePacks == null ||
@@ -56,8 +57,7 @@ internal partial class EndfieldGameInstaller
                 progressStateDelegate?.Invoke(state);
             }
 
-            // 并发文件预校验
-            Report(InstallProgressState.Preparing);
+            Report(InstallProgressState.Verify);
             SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Verifying existing packages...");
 
             var packsToDownload = new ConcurrentBag<EndfieldPack>();
@@ -75,7 +75,7 @@ internal partial class EndfieldGameInstaller
                     if (string.IsNullOrEmpty(pack.Url)) return;
                     long.TryParse(pack.PackageSize, out var size);
 
-                    var fileName = Path.GetFileName(new Uri(pack.Url).LocalPath);
+                    var fileName = Path.GetFileName(new Uri(pack.Url!).LocalPath);
                     var filePath = Path.Combine(downloadDir, fileName);
                     var tempPath = filePath + ".tmp";
 
@@ -108,7 +108,15 @@ internal partial class EndfieldGameInstaller
                     {
                         if (File.Exists(tempPath))
                             if (new FileInfo(tempPath).Length > size)
-                                File.Delete(tempPath);
+                                try
+                                {
+                                    File.Delete(tempPath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedStatic.InstanceLogger.LogDebug(
+                                        $"[Endfield] Temp file delete failed: {ex.Message}");
+                                }
 
                         packsToDownload.Add(pack);
                     }
@@ -123,7 +131,7 @@ internal partial class EndfieldGameInstaller
             //断点续传下载
             if (downloadTasks.Count > 0)
             {
-                progressStateDelegate?.Invoke(InstallProgressState.Download);
+                Report(InstallProgressState.Download);
                 SharedStatic.InstanceLogger.LogInformation(
                     $"[EndfieldInstaller] Downloading {downloadTasks.Count} files...");
 
@@ -133,7 +141,7 @@ internal partial class EndfieldGameInstaller
                     CancellationToken = token
                 }, async (pack, innerToken) =>
                 {
-                    var fileName = Path.GetFileName(new Uri(pack.Url).LocalPath);
+                    var fileName = Path.GetFileName(new Uri(pack.Url!).LocalPath);
                     var filePath = Path.Combine(downloadDir, fileName);
                     var tempPath = filePath + ".tmp";
                     var expectedSize = long.Parse(pack.PackageSize ?? "0");
@@ -153,8 +161,10 @@ internal partial class EndfieldGameInstaller
                             {
                                 File.Delete(tempPath);
                             }
-                            catch
+                            catch (Exception ex)
                             {
+                                SharedStatic.InstanceLogger.LogDebug(
+                                    $"[Endfield] Temp file delete failed: {ex.Message}");
                             }
 
                             throw new Exception($"MD5 Mismatch after downloading {fileName}");
@@ -169,21 +179,17 @@ internal partial class EndfieldGameInstaller
                 });
             }
 
-            // 分发IO执行流
-            progressStateDelegate?.Invoke(InstallProgressState.Install);
-
             if (manager.IsDeltaUpdate)
             {
                 SharedStatic.InstanceLogger.LogInformation(
                     "[EndfieldInstaller] Delta update mechanism confirmed. Initializing sandbox extraction...");
                 var tempExtractDir = Path.Combine(installPath, "_Endfield_DeltaTemp");
+                // DEBUG
                 var skipExtractForDebug = false;
-#if DEBUG
-                skipExtractForDebug = true;
-#endif
 
                 if (!skipExtractForDebug)
                 {
+                    Report(InstallProgressState.Updating);
                     if (Directory.Exists(tempExtractDir)) Directory.Delete(tempExtractDir, true);
                     Directory.CreateDirectory(tempExtractDir);
 
@@ -191,26 +197,35 @@ internal partial class EndfieldGameInstaller
                     {
                         progress.DownloadedBytes = extractedBytes;
                         progress.TotalBytesToDownload = totalBytes;
-                        Report(InstallProgressState.Install);
+                        Report(InstallProgressState.Updating);
                     });
                 }
 
+                Report(InstallProgressState.Removing);
                 SharedStatic.InstanceLogger.LogInformation(
                     "[EndfieldInstaller] Cleaning up legacy files and updating core components...");
 
                 var deleteListPath = Path.Combine(tempExtractDir, "delete_files.txt");
                 if (File.Exists(deleteListPath))
                 {
-                    SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Processing delete_files.txt...");
                     var filesToDelete = File.ReadAllLines(deleteListPath);
                     foreach (var fileLine in filesToDelete)
                     {
                         if (string.IsNullOrWhiteSpace(fileLine)) continue;
                         var targetDeletePath = Path.Combine(installPath, fileLine.Trim().Replace("/", "\\"));
-                        if (File.Exists(targetDeletePath)) File.Delete(targetDeletePath);
+                        if (File.Exists(targetDeletePath))
+                            try
+                            {
+                                File.Delete(targetDeletePath);
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedStatic.InstanceLogger.LogDebug($"[Endfield] File delete failed: {ex.Message}");
+                            }
                     }
                 }
 
+                Report(InstallProgressState.Updating);
                 SharedStatic.InstanceLogger.LogInformation(
                     "[EndfieldInstaller] Copying static update files...");
                 foreach (var newPath in Directory.GetFiles(tempExtractDir, "*.*", SearchOption.AllDirectories))
@@ -235,7 +250,7 @@ internal partial class EndfieldGameInstaller
                     {
                         progress.DownloadedBytes = patchedBytes;
                         progress.TotalBytesToDownload = totalBytes;
-                        Report(InstallProgressState.Install);
+                        Report(InstallProgressState.Updating);
                     });
 
                 // 调试模式下保留沙盒目录，非调试模式下执行清理
@@ -244,12 +259,14 @@ internal partial class EndfieldGameInstaller
                     {
                         Directory.Delete(tempExtractDir, true);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        SharedStatic.InstanceLogger.LogDebug($"[Endfield] Temp dir cleanup failed: {ex.Message}");
                     }
             }
             else
             {
+                Report(InstallProgressState.Install);
                 SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Full update mechanism confirmed.");
                 await ExtractPackagesAsync(downloadDir, installPath, token, (extractedBytes, totalBytes) =>
                 {
@@ -263,46 +280,27 @@ internal partial class EndfieldGameInstaller
             {
                 Directory.Delete(downloadDir, true);
             }
-            catch
+            catch (Exception ex)
             {
+                SharedStatic.InstanceLogger.LogDebug($"[Endfield] Download dir cleanup failed: {ex.Message}");
             }
 
-            if (!string.IsNullOrEmpty(manager.TargetVersion))
-            {
-                var configPath = Path.Combine(installPath, "config.ini");
-                if (File.Exists(configPath))
-                    try
-                    {
-                        var decryptedConfig = ConfigTool.ReadConfig(configPath);
-                        if (!string.IsNullOrEmpty(decryptedConfig))
-                        {
-                            var lines = decryptedConfig.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                            var versionUpdated = false;
-                            for (var i = 0; i < lines.Length; i++)
-                                if (lines[i].Trim().StartsWith("version=", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    lines[i] = $"version={manager.TargetVersion}";
-                                    versionUpdated = true;
-                                    break;
-                                }
+            SharedStatic.InstanceLogger.LogInformation(
+                "[EndfieldInstaller] Update phase completed. Initiating post-update integrity verification...");
 
-                            if (versionUpdated)
-                            {
-                                var newConfigContent = string.Join("\r\n", lines);
-                                EndfieldCrypto.EncryptStringToFile(newConfigContent, configPath);
-                                SharedStatic.InstanceLogger.LogInformation(
-                                    $"[EndfieldInstaller] Successfully updated encrypted config.ini version to {manager.TargetVersion}");
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedStatic.InstanceLogger.LogError(
-                            $"[EndfieldInstaller] Failed to update config.ini: {ex.Message}");
-                    }
+            try
+            {
+                var repairer = new EndfieldGameRepairer(_owner._downloadHttpClient, manager, installPath);
+                await repairer.StartRepairAsync(progressDelegate, progressStateDelegate, token);
+            }
+            catch (Exception ex)
+            {
+                SharedStatic.InstanceLogger.LogError(
+                    $"[EndfieldInstaller] Post-update integrity verification failed: {ex}");
+                throw;
             }
 
-            progressStateDelegate?.Invoke(InstallProgressState.Completed);
+            Report(InstallProgressState.Completed);
         }
 
         private async Task ApplyDeltaPatchAsync(string tempExtractDir, string targetGameRoot, string? patchJsonUrl,
@@ -326,20 +324,23 @@ internal partial class EndfieldGameInstaller
             var vfsBasePath = Path.Combine(targetGameRoot,
                 (manifest.VfsBasePath ?? "Endfield_Data/StreamingAssets/VFS").Replace("/", "\\"));
 
-            var totalFiles = manifest.Files?.Count ?? 0;
-            var currentProcessed = 0;
             var totalPatchSize = manifest.Files?.Sum(f => f.Size) ?? 0;
             long currentPatchedSize = 0;
 
             SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Building temporary extraction file map...");
-            var allExtractedFiles = Directory.GetFiles(tempExtractDir, "*", SearchOption.AllDirectories);
             var extractFileMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var file in allExtractedFiles) extractFileMap[Path.GetFileName(file)] = file;
+
+            await Task.Run(() =>
+            {
+                var allExtractedFiles = Directory.GetFiles(tempExtractDir, "*", SearchOption.AllDirectories);
+                foreach (var file in allExtractedFiles) extractFileMap[Path.GetFileName(file)] = file;
+            }, token);
+
+            SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Starting VFS delta patch pipeline...");
 
             foreach (var fileNode in manifest.Files!)
             {
                 token.ThrowIfCancellationRequested();
-                currentProcessed++;
 
                 var targetFilePath = Path.Combine(vfsBasePath, fileNode.Name!.Replace("/", "\\"));
                 var targetDir = Path.GetDirectoryName(targetFilePath)!;
@@ -358,6 +359,7 @@ internal partial class EndfieldGameInstaller
                         File.Copy(sourceExtractedFile, targetFilePath, true);
                         Interlocked.Add(ref currentPatchedSize, fileNode.Size);
                         progressCallback?.Invoke(currentPatchedSize, totalPatchSize);
+                        SharedStatic.InstanceLogger.LogDebug($"[EndfieldInstaller] [Copy] {fileNode.Name}");
                     }
                 }
                 else if (fileNode.Patches != null && fileNode.Patches.Count > 0)
@@ -365,6 +367,7 @@ internal partial class EndfieldGameInstaller
                     var patchInfo = fileNode.Patches[0];
                     var baseFilePath = Path.Combine(vfsBasePath, patchInfo.BaseFile!.Replace("/", "\\"));
                     var diffFilePath = Path.Combine(tempExtractDir, patchInfo.PatchPath!.Replace("/", "\\"));
+
                     if (!File.Exists(diffFilePath) && extractFileMap.TryGetValue(Path.GetFileName(patchInfo.PatchPath!),
                             out var foundDiffPath))
                         diffFilePath = foundDiffPath;
@@ -385,6 +388,7 @@ internal partial class EndfieldGameInstaller
 
                             hdiffPatcher.Patch(baseFilePath, tempOutPath, true, onPatchProgress, token);
                             File.Move(tempOutPath, targetFilePath, true);
+                            SharedStatic.InstanceLogger.LogDebug($"[EndfieldInstaller] [Patch] {fileNode.Name}");
                         }
                         catch (Exception ex)
                         {
@@ -393,11 +397,6 @@ internal partial class EndfieldGameInstaller
                             if (File.Exists(tempOutPath)) File.Delete(tempOutPath);
                             throw;
                         }
-                    }
-                    else
-                    {
-                        SharedStatic.InstanceLogger.LogWarning(
-                            $"[EndfieldInstaller] VFS node lookup failed for delta target. Base exists: {File.Exists(baseFilePath)}, Diff exists: {File.Exists(diffFilePath)}. Skipped {fileNode.Name}");
                     }
                 }
             }
@@ -436,10 +435,8 @@ internal partial class EndfieldGameInstaller
                 await _owner._downloadHttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
 
             if (existingLength > 0 && response.StatusCode != HttpStatusCode.PartialContent)
-            {
-                existingLength = 0;
-                if (File.Exists(tempPath)) File.Delete(tempPath);
-            }
+                if (File.Exists(tempPath))
+                    File.Delete(tempPath);
 
             response.EnsureSuccessStatusCode();
 
@@ -462,22 +459,18 @@ internal partial class EndfieldGameInstaller
                 ArrayPool<byte>.Shared.Return(buffer);
             }
 
-            var finalInfo = new FileInfo(tempPath);
-            if (finalInfo.Length != expectedSize)
-                throw new Exception($"Download incomplete. Expected {expectedSize}, got {finalInfo.Length}");
+            if (new FileInfo(tempPath).Length != expectedSize)
+                throw new Exception($"Download incomplete for {url}");
         }
 
         private async Task<bool> CheckMd5Async(string filePath, string expectedMd5, CancellationToken token)
         {
             if (!File.Exists(filePath)) return false;
-
             using var md5 = MD5.Create();
-            using var stream = File.OpenRead(filePath);
-
+            await using var stream = File.OpenRead(filePath);
             var hashBytes = await md5.ComputeHashAsync(stream, token);
-            var hashStr = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-
-            return hashStr.Equals(expectedMd5, StringComparison.OrdinalIgnoreCase);
+            return BitConverter.ToString(hashBytes).Replace("-", "")
+                .Equals(expectedMd5, StringComparison.OrdinalIgnoreCase);
         }
 
         private async Task ExtractPackagesAsync(string sourceDir, string destDir, CancellationToken token,

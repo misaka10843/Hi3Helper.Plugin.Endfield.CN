@@ -63,7 +63,17 @@ internal partial class EndfieldGameManager : GameManagerBase
         }
     }
 
-    protected override bool HasUpdate => IsInstalled && _latestGameInfo?.Action == 1;
+    protected override bool HasUpdate
+    {
+        get
+        {
+            if (!IsInstalled) return false;
+            
+            bool isVersionDifferent = !ApiGameVersion.Equals(CurrentGameVersion);
+
+            return isVersionDifferent || _latestGameInfo?.Action == 1;
+        }
+    }
 
     protected override bool HasPreload => false;
     protected override GameVersion ApiGameVersion { get; set; }

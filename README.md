@@ -13,7 +13,7 @@
 A third-party plugin for [Collapse Launcher](https://collapselauncher.com/), designed to support the downloading,
 updating, and launching of **Arknights: Endfield**.
 
-The core functionality is currently ready for daily game management and launching.
+**Current Status**: Core functionality is now fully implemented. Implementation of extended features is pending official game support and upcoming updates to the Collapse Launcher.
 
 <img width="80%" alt="Plugin Preview" src="https://github.com/user-attachments/assets/f3f572c0-bfb7-4436-b8e7-47765f42c052" />
 
@@ -36,8 +36,6 @@ The core functionality is currently ready for daily game management and launchin
 > 1. **Pre-download**: The official launcher has not yet enabled pre-download functionality, so the corresponding data structure is currently unknown.
 > 2. **manual Integrity Check**: Collapse Launcher does not currently provide the relevant API endpoints; waiting for upstream
      updates.
-
-**It is highly recommended to back up your game directory before updating to prevent file corruption due to update errors.**
 
 ## ✨ Features
 

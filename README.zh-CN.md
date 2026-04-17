@@ -13,7 +13,7 @@
 为 [Collapse Launcher (Collapse 启动器)](https://collapselauncher.com/) 开发的第三方插件，旨在支持 **《明日方舟：终末地》**
 的下载、更新与启动。
 
-当前插件核心功能已就绪，可正常用于日常游戏启动与管理。
+**插件当前状态**: 当前基本功能均已实现，扩展功能需要等待官方支持和Collapse的更新
 
 <img width="80%" alt="Plugin Preview" src="https://github.com/user-attachments/assets/f3f572c0-bfb7-4436-b8e7-47765f42c052" />
 

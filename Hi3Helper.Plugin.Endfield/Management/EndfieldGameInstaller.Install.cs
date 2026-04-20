@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Hi3Helper.Plugin.Core;
@@ -340,28 +341,44 @@ internal partial class EndfieldGameInstaller
             Report(InstallProgressState.Completed);
         }
 
-        private async Task ApplyDeltaPatchAsync(string tempExtractDir, string targetGameRoot, string? patchJsonUrl,
+private async Task ApplyDeltaPatchAsync(string tempExtractDir, string targetGameRoot, string? patchJsonUrl,
             CancellationToken token, Action<long, long>? progressCallback = null)
         {
-            if (string.IsNullOrEmpty(patchJsonUrl))
-                throw new InvalidDataException("[EndfieldInstaller] Patch configuration URL is missing.");
+            EndfieldPatchManifest? manifest = null;
+            string localPatchJsonPath = Path.Combine(tempExtractDir, "patch.json");
 
-            SharedStatic.InstanceLogger.LogInformation(
-                $"[EndfieldInstaller] Fetching delta patch manifest: {patchJsonUrl}");
+            // 检查增量包中是否有修补文件清单
+            if (File.Exists(localPatchJsonPath))
+            {
+                SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Found local patch.json in sandbox. Reading manifest...");
+                await using var fs = File.OpenRead(localPatchJsonPath);
+                manifest = await JsonSerializer.DeserializeAsync(fs, EndfieldApiContext.Default.EndfieldPatchManifest, cancellationToken: token);
+            }
+            // 检查API是否有修补文件清单
+            else if (!string.IsNullOrEmpty(patchJsonUrl))
+            {
+                SharedStatic.InstanceLogger.LogInformation($"[EndfieldInstaller] Fetching delta patch manifest from URL: {patchJsonUrl}");
+                using var httpClient = new HttpClient();
+                using var response = await httpClient.GetAsync(patchJsonUrl, HttpCompletionOption.ResponseHeadersRead, token);
+                response.EnsureSuccessStatusCode();
+                manifest = await response.Content.ReadFromJsonAsync(EndfieldApiContext.Default.EndfieldPatchManifest, cancellationToken: token);
+            }
+            // 如果两边都没有就直接跳过修补，代表仅覆盖即可
+            else
+            {
+                SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] No patch.json found and no URL provided. Assuming static-only delta update. Skipping VFS patching.");
+                return;
+            }
 
-            using var httpClient = new HttpClient();
-            using var response =
-                await httpClient.GetAsync(patchJsonUrl, HttpCompletionOption.ResponseHeadersRead, token);
-            response.EnsureSuccessStatusCode();
-
-            var manifest =
-                await response.Content.ReadFromJsonAsync(EndfieldApiContext.Default.EndfieldPatchManifest, token)
-                ?? throw new InvalidDataException("[EndfieldInstaller] Failed to deserialize EndfieldPatchManifest.");
+            if (manifest == null || manifest.Files == null)
+            {
+                throw new InvalidDataException("[EndfieldInstaller] Failed to load or deserialize Patch Manifest (patch.json).");
+            }
 
             var vfsBasePath = Path.Combine(targetGameRoot,
                 (manifest.VfsBasePath ?? "Endfield_Data/StreamingAssets/VFS").Replace("/", "\\"));
 
-            var totalPatchSize = manifest.Files?.Sum(f => f.Size) ?? 0;
+            var totalPatchSize = manifest.Files.Sum(f => f.Size);
             long currentPatchedSize = 0;
 
             SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Building temporary extraction file map...");
@@ -375,7 +392,7 @@ internal partial class EndfieldGameInstaller
 
             SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Starting VFS delta patch pipeline...");
 
-            foreach (var fileNode in manifest.Files!)
+            foreach (var fileNode in manifest.Files)
             {
                 token.ThrowIfCancellationRequested();
 

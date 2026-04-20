@@ -341,39 +341,44 @@ internal partial class EndfieldGameInstaller
             Report(InstallProgressState.Completed);
         }
 
-private async Task ApplyDeltaPatchAsync(string tempExtractDir, string targetGameRoot, string? patchJsonUrl,
+        private async Task ApplyDeltaPatchAsync(string tempExtractDir, string targetGameRoot, string? patchJsonUrl,
             CancellationToken token, Action<long, long>? progressCallback = null)
         {
             EndfieldPatchManifest? manifest = null;
-            string localPatchJsonPath = Path.Combine(tempExtractDir, "patch.json");
+            var localPatchJsonPath = Path.Combine(tempExtractDir, "patch.json");
 
             // 检查增量包中是否有修补文件清单
             if (File.Exists(localPatchJsonPath))
             {
-                SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Found local patch.json in sandbox. Reading manifest...");
+                SharedStatic.InstanceLogger.LogInformation(
+                    "[EndfieldInstaller] Found local patch.json in sandbox. Reading manifest...");
                 await using var fs = File.OpenRead(localPatchJsonPath);
-                manifest = await JsonSerializer.DeserializeAsync(fs, EndfieldApiContext.Default.EndfieldPatchManifest, cancellationToken: token);
+                manifest = await JsonSerializer.DeserializeAsync(fs, EndfieldApiContext.Default.EndfieldPatchManifest,
+                    token);
             }
             // 检查API是否有修补文件清单
             else if (!string.IsNullOrEmpty(patchJsonUrl))
             {
-                SharedStatic.InstanceLogger.LogInformation($"[EndfieldInstaller] Fetching delta patch manifest from URL: {patchJsonUrl}");
+                SharedStatic.InstanceLogger.LogInformation(
+                    $"[EndfieldInstaller] Fetching delta patch manifest from URL: {patchJsonUrl}");
                 using var httpClient = new HttpClient();
-                using var response = await httpClient.GetAsync(patchJsonUrl, HttpCompletionOption.ResponseHeadersRead, token);
+                using var response =
+                    await httpClient.GetAsync(patchJsonUrl, HttpCompletionOption.ResponseHeadersRead, token);
                 response.EnsureSuccessStatusCode();
-                manifest = await response.Content.ReadFromJsonAsync(EndfieldApiContext.Default.EndfieldPatchManifest, cancellationToken: token);
+                manifest = await response.Content.ReadFromJsonAsync(EndfieldApiContext.Default.EndfieldPatchManifest,
+                    token);
             }
             // 如果两边都没有就直接跳过修补，代表仅覆盖即可
             else
             {
-                SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] No patch.json found and no URL provided. Assuming static-only delta update. Skipping VFS patching.");
+                SharedStatic.InstanceLogger.LogInformation(
+                    "[EndfieldInstaller] No patch.json found and no URL provided. Assuming static-only delta update. Skipping VFS patching.");
                 return;
             }
 
             if (manifest == null || manifest.Files == null)
-            {
-                throw new InvalidDataException("[EndfieldInstaller] Failed to load or deserialize Patch Manifest (patch.json).");
-            }
+                throw new InvalidDataException(
+                    "[EndfieldInstaller] Failed to load or deserialize Patch Manifest (patch.json).");
 
             var vfsBasePath = Path.Combine(targetGameRoot,
                 (manifest.VfsBasePath ?? "Endfield_Data/StreamingAssets/VFS").Replace("/", "\\"));

@@ -17,7 +17,7 @@ body:
     id: affected-plugin-version
     attributes:
       label: Affected Version
-      description: Plugin Version where the bug was encountered.
+      description: Plugin Version where the bug was encountered. Please confirm if it is the latest version. If not, it will not be processed.
       placeholder: e.g. 0.5.0
     validations:
       required: true

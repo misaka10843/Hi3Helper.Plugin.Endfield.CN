@@ -1,0 +1,105 @@
+name: Bug 报告
+description: 创建报告以帮助我们修复用于 Collapse 的鹰角网络游戏插件！
+assignees:
+  - misaka10843
+title: "[Bug]: "
+labels: ['Needs Triaging']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您帮助我们让 Hi3Helper.Plugin.Hypergryph 变得更好！
+        在填写任何内容之前，请确保**没有**与此主题相关的已开启/已关闭 Issue，并且该问题是*可复现的*。
+        除非另有说明，否则所有文本区域均支持 Markdown 语法。
+
+  - type: dropdown
+    id: affected-module
+    attributes:
+      label: 受影响的模块/插件
+      description: 请选择发生 Bug 的插件或模块。
+      options:
+        - Hi3Helper.Hypergryph.Core
+        - Hi3Helper.Plugin.Endfield
+        - Hi3Helper.Plugin.Arknights
+        - General / 其他
+    validations:
+      required: true
+
+  - type: input
+    id: affected-plugin-version
+    attributes:
+      label: 受影响的插件版本
+      description: 遇到 Bug 时的插件版本。请确认是否为最新版本。
+      placeholder: 例如 0.5.0
+    validations:
+      required: true
+
+  - type: input
+    id: affected-launcher-version
+    attributes:
+      label: 受影响的启动器版本
+      description: 遇到 Bug 时的启动器版本。
+      placeholder: 例如 Collapse 1.83.13
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 系统信息
+        请在此 Issue 中附加一份 `dxdiag.txt` 的副本，以便我们更好地了解您的硬件配置。
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 控制台日志
+        在此处的代码块中粘贴日志，或在此处附加日志文件。默认情况下，日志文件的位置为 `C:\Users\%username%\AppData\LocalLow\CollapseLauncher\_logs`
+
+  - type: textarea
+    id: bug-behavior
+    attributes:
+      label: 错误行为
+      description: 尽可能详细地描述遇到的 Bug。
+      placeholder: 发生了什么？
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 预期行为
+      description: 描述 Collapse 和/或插件应该表现出的正常行为。
+      placeholder: 应该发生什么？
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: 复现步骤
+      description: 描述您复现该 Bug 所采取的步骤。
+      placeholder: |
+        1. [第一步]
+        2. [第二步]
+        3. [以此类推...]
+    validations:
+      required: true
+
+  - type: input
+    id: related-issues
+    attributes:
+      label: 相关 Issue
+      description: 如果此 Issue 影响其他 Issue 或具有潜在关联，请在此标记。
+      placeholder: 例如 `#144`
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图
+      description: 如果此问题涉及视觉组件，请在此处粘贴相关截图。
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 附加信息
+      description: 如果您还有其他可以提供帮助的内容（日志、转储文件、评论），请留在这里。

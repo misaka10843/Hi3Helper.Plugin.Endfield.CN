@@ -1,23 +1,35 @@
----
 name: Bug Report
-description: Create a report to help us fix the Wuthering Waves Plugin for Collapse!
-assignees: 
+description: Create a report to help us fix the Hypergryph Plugins for Collapse!
+assignees:
   - misaka10843
 title: "[Bug]: "
-labels: ['Needs Triaging']
+labels: [ 'Needs Triaging' ]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for trying to help us make Collapse better for everyone!
+        Thank you for trying to help us make Hi3Helper.Plugin.Hypergryph better for everyone!
         Before filling anything out, please make sure that there **aren't** any open/closed issues for this topic & that this is *reproducible*.
         All text areas support markdown syntax unless explicitly noted otherwise.
+
+  - type: dropdown
+    id: affected-module
+    attributes:
+      label: Affected Module/plugins
+      description: Please select the plugin or module where the bug occurred.
+      options:
+        - Hi3Helper.Hypergryph.Core
+        - Hi3Helper.Plugin.Endfield
+        - Hi3Helper.Plugin.Arknights
+        - General / Other
+    validations:
+      required: true
 
   - type: input
     id: affected-plugin-version
     attributes:
-      label: Affected Version
-      description: Plugin Version where the bug was encountered. Please confirm if it is the latest version. If not, it will not be processed.
+      label: Affected Plugin Version
+      description: Plugin Version where the bug was encountered. Please confirm if it is the latest version.
       placeholder: e.g. 0.5.0
     validations:
       required: true
@@ -25,24 +37,24 @@ body:
   - type: input
     id: affected-launcher-version
     attributes:
-      label: Affected Version
+      label: Affected Launcher Version
       description: Launcher Version where the bug was encountered.
       placeholder: e.g. Collapse 1.83.13
     validations:
       required: true
-  
+
   - type: markdown
     attributes:
       value: |
         ### System Information
-        Please attach a copy of `dxdiag.txt` to this issue so that we can better understand your hardware configuration: "Save all information" (Run > Type `dxdiag` then enter > Save all information > Then Drag & Drop the file to your issue, or attach it through the file selection dialog). 
-      
+        Please attach a copy of `dxdiag.txt` to this issue so that we can better understand your hardware configuration.
+
   - type: markdown
     attributes:
       value: |
         ###  Console Log
-        Paste the log inside a code block here or attach the log file here. By default, the location for the log file is `C:\Users\%username%\AppData\LocalLow\CollapseLauncher\_logs` The latest log will be today's date, or the date of the last time you launched Collapse.
-   
+        Paste the log inside a code block here or attach the log file here. By default, the location for the log file is `C:\Users\%username%\AppData\LocalLow\CollapseLauncher\_logs`
+
   - type: textarea
     id: bug-behavior
     attributes:
@@ -51,44 +63,43 @@ body:
       placeholder: What happened?
     validations:
       required: true
-  
+
   - type: textarea
     id: expected-behavior
     attributes:
       label: Expected Behavior
-      description: Describe how Collapse and/or the plugin should have behaved, being as detailed as possible in your answer.
+      description: Describe how Collapse and/or the plugin should have behaved.
       placeholder: What should have happened?
     validations:
       required: true
-      
+
   - type: textarea
     id: reproduction-steps
     attributes:
       label: Steps to reproduce
-      description: Describe the steps you took to reproduce the bug, with as much detail as possible.
+      description: Describe the steps you took to reproduce the bug.
       placeholder: |
         1. [First step]
         2. [Second step]
         3. [so on...]
     validations:
       required: true
-  
+
   - type: input
     id: related-issues
     attributes:
       label: Related Issues
       description: If this issue affects other issues or has the potential to, mark it here.
       placeholder: e.g. `#144`
-  
+
   - type: textarea
     id: screenshots
     attributes:
       label: Screenshot(s)
-      description: If this issue affects a visual component (UI element) of Collapse, please paste the relevant screenshots, recordings and GIFs here.
-  
+      description: If this issue affects a visual component, please paste the relevant screenshots here.
+
   - type: textarea
     id: additional-info
     attributes:
       label: Additional Information
-      description: If you have anything else to add that may help with resolving the issue (logs, dumps, comments, etc.), feel free to leave them here.
----
+      description: If you have anything else to add that may help (logs, dumps, comments), leave them here.

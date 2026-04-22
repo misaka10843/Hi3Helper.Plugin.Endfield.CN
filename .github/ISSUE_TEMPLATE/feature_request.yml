@@ -9,13 +9,13 @@ body:
     - type: markdown
       attributes:
         value: |
-          This is the Feature and/or Enhancement request form for Collapse. Before filling it out, please make sure that there are **no open/closed issues** regarding your request. All text areas support markdown syntax unless explicitly noted otherwise. We will close the issue if it is a duplicate.
+          This is the Feature and/or Enhancement request form for Hi3Helper.Plugin.Hypergryph. Before filling it out, please make sure that there are **no open/closed issues** regarding your request. All text areas support markdown syntax unless explicitly noted otherwise. We will close the issue if it is a duplicate.
 
     - type: dropdown
       id: is-related
       attributes:
         label: Is your request related to a problem?
-        description: This can take the form of an improvement that fixes an issue in Collapse
+        description: This can take the form of an improvement that fixes an issue in Hi3Helper.Plugin.Hypergryph
         options:
           - 'Yes'
           - 'No'
@@ -46,7 +46,7 @@ body:
       attributes:
         label: Describe alternatives you've considered
         description: A clear and concise description of any alternative solutions or features you've considered.
-        placeholder: What are the alternatives you've considered? Sometimes, the Collapse team can't always implement everything the way you envisioned it, so what are some compromises, changes you're willing to make to the current proposal?
+        placeholder: What are the alternatives you've considered? Sometimes, we can't always implement everything the way you envisioned it, so what are some compromises, changes you're willing to make to the current proposal?
       validations:
         required: true
 

@@ -1,0 +1,59 @@
+name: 功能请求/改进建议
+description: 为新功能或更改提议一个想法。
+title: "[请求]: "
+labels: ['Enhancement']
+assignees:
+  - misaka10843
+body:
+  - type: markdown
+    attributes:
+      value: |
+        这是针对 Hi3Helper.Plugin.Hypergryph 的功能请求和/或改进建议表单。在填写之前，请确保**没有**关于您的请求的已开启/已关闭 Issue。除非另有说明，否则所有文本区域均支持 Markdown 语法。如果是重复的请求，我们将关闭该 Issue。
+
+  - type: dropdown
+    id: is-related
+    attributes:
+      label: 您的请求是否与某个问题相关？
+      description: 这可以是一个修复 Hi3Helper.Plugin.Hypergryph 中某个问题的改进方案。
+      options:
+        - '是'
+        - '否'
+      default: 1
+    validations:
+      required: true
+
+  - type: textarea
+    id: related-desc
+    attributes:
+      label: 该功能请求与该问题有何关联？
+      description: 如果您在上一题中回答了“否”，可以跳过此字段。
+      placeholder: 如果相关，请解释该功能与问题的关联。
+    validations:
+      required: false
+
+  - type: textarea
+    id: solution-desc
+    attributes:
+      label: 描述您的建议解决方案
+      description: 清晰简洁地描述您希望实现的功能。
+      placeholder: 请尽可能详细地说明。
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternative-desc
+    attributes:
+      label: 描述您考虑过的替代方案
+      description: 清晰简洁地描述您考虑过的任何替代方案或功能。
+      placeholder: 您考虑过哪些替代方案？有时我们无法完全按照您的设想实现所有内容，因此对于当前的提议，您愿意做出哪些折中或更改？
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 附加上下文
+      description: 在此处添加关于功能请求的任何其他上下文或截图。
+      placeholder: 如果有任何您愿意分享的图片、概念图、代码片段，请放在这里。
+    validations:
+      required: false

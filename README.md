@@ -6,7 +6,7 @@
 
 # Hi3Helper.Plugin.Hypergryph
 
-**English** · [简体中文](https://www.google.com/search?q=./README_ZH.md)
+**English** · [简体中文](./README.zh-CN.md)
 
 A third-party plugin developed for [Collapse Launcher](https://collapselauncher.com/), designed to support the
 downloading, updating, and launching of games published by **Hypergryph**.
@@ -84,12 +84,18 @@ Before using this plugin, please ensure your Collapse Launcher version is `1.83.
    Go to the [Releases page](https://github.com/misaka10843/Hi3Helper.Plugin.Hypergryph/releases/latest) and download
    the latest plugin archive (`.zip` file).
 
+    ![Release Download Page](./.github/assets/img.png)
+
 2. **Enter Plugin Management**
    Open the launcher, go to the **Settings** page, scroll down, and click `Open Plugin Management Menu`.
+
+   ![Settings Menu](./.github/assets/img_2.png)
 
 3. **Add and Apply**
    In the pop-up window, click the `Click to add .zip or manifest.json` button and select the `.zip` file you just
    downloaded. After adding, **restart the launcher** for the changes to take effect.
+
+   ![Add Plugin Dialog](./.github/assets/img_1.png)
 
 -----
 

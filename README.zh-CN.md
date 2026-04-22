@@ -4,14 +4,12 @@
 
 <div align="center">
 
-# Hi3Helper.Plugin.Endfield
+# Hi3Helper.Plugin.Hypergryph
 
 [English](./README.md) · **简体中文**
 
-[明日方舟](https://github.com/misaka10843/Hi3Helper.Plugin.Arknights) · **明日方舟：终末地**
-
-为 [Collapse Launcher (Collapse 启动器)](https://collapselauncher.com/) 开发的第三方插件，旨在支持 **《明日方舟：终末地》**
-的下载、更新与启动。
+为 [Collapse Launcher (Collapse 启动器)](https://collapselauncher.com/) 开发的第三方插件，旨在支持 **鹰角网络**
+发布的游戏下载、更新与启动。
 
 **插件当前状态**: 当前基本功能均已实现，扩展功能需要等待官方支持和Collapse的更新
 
@@ -21,8 +19,8 @@
 
 <p align="center">
   <a href="https://github.com/palmcivet/awesome-arknights-endfield"><img src="https://github.com/palmcivet/awesome-arknights-endfield/blob/main/assets/badge-for-the-badge.svg" alt="Awesome Arknights Endfield badge" /></a>
-  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/graphs/contributors" target="_blank"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/misaka10843/Hi3Helper.Plugin.Endfield?style=for-the-badge&logo=github"></a>
-  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/stargazers" target="_blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/misaka10843/Hi3Helper.Plugin.Endfield?style=for-the-badge&label=%E2%AD%90STAR"></a>
+  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Hypergryph/graphs/contributors" target="_blank"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/misaka10843/Hi3Helper.Plugin.Hypergryph?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Hypergryph/stargazers" target="_blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/misaka10843/Hi3Helper.Plugin.Hypergryph?style=for-the-badge&label=%E2%AD%90STAR"></a>
 </p>
 
 ---
@@ -37,6 +35,13 @@
 > 1. **预下载功能**：当前官方启动器还并未开启预下载功能，暂时无法获知对应的数据结构，因此无法支持。
 > 2. **手动完整性校验**：手动校验目前Collapse启动器似乎暂未提供相关 API 接口，需等待上游更新。
 
+> [!IMPORTANT]
+> 此插件并不是Collapse官方维护的，所以请不要前往Collapse的官方仓库提交issue和前往官方Discord提交issue
+> 
+> 请优先在此仓库中提交issue，在其他的渠道提交issue将不会第一时间得到支持！
+
+**如果这个插件帮到了您，还请您点个⭐来支持我！**
+
 ## ✨ 功能特性
 
 ### ✅ 当前已支持
@@ -45,10 +50,7 @@
 - **资讯获取**：自动拉取并展示官方背景图、Banner 以及最新新闻公告。
 - **游戏管理**：支持完整的游戏下载、安装、启动及运行检测。
 - **游戏更新**：支持更新游戏。
-- **多服支持**：
-  - [x] 国服 (CN)
-  - [x] 全球服 (Global)
-  - [x] Bilibili服 (Bili)
+- **多服支持**
 - **增量游戏更新**：当前增量游戏更新为beta功能，可能会导致更新失败/报错/游戏文件损坏等问题，请在更新前备份游戏文件。
 - **完整性校验**：在更新后会自动进行完整性校验与游戏修复。
 
@@ -69,7 +71,7 @@
 ### 安装步骤
 
 1. **下载插件**
-   前往 [Releases 页面](https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/releases/latest) 下载最新的插件压缩包（
+   前往 [Releases 页面](https://github.com/misaka10843/Hi3Helper.Plugin.Hypergryph/releases/latest) 下载最新的插件压缩包（
    `.zip` 文件）。
 
    ![Release Download Page](./.github/assets/img.png)

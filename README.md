@@ -4,16 +4,15 @@
 
 <div align="center">
 
-# Hi3Helper.Plugin.Endfield
+# Hi3Helper.Plugin.Hypergryph
 
-**English** · [简体中文](./README.zh-CN.md)
+**English** · [简体中文](https://www.google.com/search?q=./README_ZH.md)
 
-[Arknights](https://github.com/misaka10843/Hi3Helper.Plugin.Arknights) · **Arknights: Endfield**
+A third-party plugin developed for [Collapse Launcher](https://collapselauncher.com/), designed to support the
+downloading, updating, and launching of games published by **Hypergryph**.
 
-A third-party plugin for [Collapse Launcher](https://collapselauncher.com/), designed to support the downloading,
-updating, and launching of **Arknights: Endfield**.
-
-**Current Status**: Core functionality is now fully implemented. Implementation of extended features is pending official game support and upcoming updates to the Collapse Launcher.
+**Plugin Status**: Currently, all basic features have been implemented. Extended features await official support and
+updates from Collapse.
 
 <img width="80%" alt="Plugin Preview" src="https://github.com/user-attachments/assets/f3f572c0-bfb7-4436-b8e7-47765f42c052" />
 
@@ -21,76 +20,79 @@ updating, and launching of **Arknights: Endfield**.
 
 <p align="center">
   <a href="https://github.com/palmcivet/awesome-arknights-endfield"><img src="https://github.com/palmcivet/awesome-arknights-endfield/blob/main/assets/badge-for-the-badge.svg" alt="Awesome Arknights Endfield badge" /></a>
-  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/graphs/contributors" target="_blank"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/misaka10843/Hi3Helper.Plugin.Endfield?style=for-the-badge&logo=github"></a>
-  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/stargazers" target="_blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/misaka10843/Hi3Helper.Plugin.Endfield?style=for-the-badge&label=%E2%AD%90STAR"></a>
+  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Hypergryph/graphs/contributors" target="_blank"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/misaka10843/Hi3Helper.Plugin.Hypergryph?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/misaka10843/Hi3Helper.Plugin.Hypergryph/stargazers" target="_blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/misaka10843/Hi3Helper.Plugin.Hypergryph?style=for-the-badge&label=%E2%AD%90STAR"></a>
 </p>
 
----
+-----
 
 > [!WARNING]
-> **Important Notes & Limitations**
-> 
-> Since there is no official plugin documentation for Collapse Launcher, this project is based on existing plugins,
-> **and may have the following limitations**:
+> **Notes and Known Limitations**
 >
-> 1. **Pre-download**: The official launcher has not yet enabled pre-download functionality, so the corresponding data structure is currently unknown.
-> 2. **manual Integrity Check**: Collapse Launcher does not currently provide the relevant API endpoints; waiting for upstream
-     updates.
+> The current incremental game update (Delta Update) is a beta feature, which may lead to update failures, errors, or
+> game file corruption. Please back up your game files before updating.
+>
+> Since Collapse Launcher currently lacks official plugin development documentation, the functionality of this project
+> is primarily based on the implementation of existing plugins, and **the following limitations may exist**:
+>
+> 1. **Pre-download Function**: The official launcher has not yet enabled the pre-download feature, making it impossible
+     to know the corresponding data structure; therefore, it is currently unsupported.
+> 2. **Manual Integrity Check**: Collapse Launcher does not seem to provide relevant API interfaces for manual
+     verification at this time; awaiting upstream updates.
+
+>[!IMPORTANT]
+>This plugin is not officially maintained by Collapse. Please do not submit issues to the official Collapse repository or official Discord.
+>
+>Please prioritize submitting issues in this repository. Submitting issues through other channels will not receive immediate support!
+
+**If this plugin helps you, consider giving it a ⭐!**
 
 ## ✨ Features
 
 ### ✅ Currently Supported
 
-- **Version Detection**: Automatically checks if the game client is up to date.
-- **Media Integration**: Fetches official background images, banners, and the latest news/announcements.
-- **Game Management**: Supports full game download, installation, launching, and running process detection.
-- **Game Update**: Supports update game.
-- **Server Support**:
-  - [x] CN Server
-  - [x] Global Server
-  - [x] Bilibili Server
-- **Delta Game Updates (Beta)**: This feature is currently in beta. It may lead to update failures, error messages, or game file corruption.
-- **Integrity Verification**: Automatic integrity checks and game repair are performed after updates.
+- **Version Detection**: Automatically detects if the client version is up to date.
+- **Information Retrieval**: Automatically pulls and displays official background images, banners, and the latest
+  news/announcements.
+- **Game Management**: Supports complete game downloading, installation, launching, and process detection.
+- **Game Update**: Supports updating the game.
+- **Multi-Server Support**
+- **Incremental Game Updates**: Current incremental game update is a beta feature, which may lead to update
+  failures/errors/file corruption. Please back up game files before updating.
+- **Integrity Verification**: Automatically performs integrity verification and game repair after an update.
 
-### 🚧 Roadmap / To-Do
+### 🚧 Development Plan / ToDo
 
-- [ ] **Pre-download Support**: Waiting for the official Launcher to implement the relevant interfaces.
-- [ ] **manual Integrity Check**: Collapse Launcher does not currently provide the relevant API endpoints; waiting for upstream
-      updates.
-- [ ] **Social Media Panel**: Integration of official social media feeds. (Functionality is implemented, but temporarily
-      disabled as icons cannot be retrieved via API).
-- [x] **Delta/Incremental Updates**: Waiting for the official launcher to support Delta/Incremental updates. Implementation will begin once the official support is available.
+- [ ] **Pre-download Support**: Awaiting the official launcher to implement relevant interfaces.
+- [ ] **Manual Integrity Check**: Collapse Launcher does not seem to provide relevant API interfaces for manual
+  verification; awaiting upstream updates.
+- [ ] **Social Media Panel**: Integrate official social media feed displays (Basic support exists, but currently
+  disabled as icons cannot be retrieved via API).
+- [x] **Incremental Game Updates**: Awaiting official Collapse support for incremental updates; will begin coding
+  related functions once supported.
 
----
+-----
 
-## 🧩 Installation
+## 🧩 How to Install the Plugin
 
 **Prerequisites:**
 Before using this plugin, please ensure your Collapse Launcher version is `1.83.14` or higher.
 
-### Steps
+### Installation Steps
 
 1. **Download the Plugin**
-   Go to the [Releases Page](https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/releases/latest) and download the
-   latest plugin archive (`.zip` file).
+   Go to the [Releases page](https://github.com/misaka10843/Hi3Helper.Plugin.Hypergryph/releases/latest) and download
+   the latest plugin archive (`.zip` file).
 
-   ![Release Download Page](./.github/assets/img.png)
+2. **Enter Plugin Management**
+   Open the launcher, go to the **Settings** page, scroll down, and click `Open Plugin Management Menu`.
 
-2. **Open Plugin Manager**
-   Open the launcher, go to **Settings**, scroll down, and click on `Open Plugin Manager Menu`.
-
-   ![Settings Menu](./.github/assets/img_2.png)
-
-3. **Add and Restart**
+3. **Add and Apply**
    In the pop-up window, click the `Click to add .zip or manifest.json` button and select the `.zip` file you just
-   downloaded.
+   downloaded. After adding, **restart the launcher** for the changes to take effect.
 
-   Once added, **restart the launcher** for the changes to take effect.
-
-   ![Add Plugin Dialog](./.github/assets/img_1.png)
-
----
+-----
 
 ## ⚠️ Disclaimer
 
-This project is a third-party open-source plugin and is not affiliated with _GRYPHLINE_ or _Hypergryph_.
+This project is a third-party open-source plugin and is not affiliated with *GRYPHLINE* or *Hypergryph*.

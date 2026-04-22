@@ -179,7 +179,7 @@ jobs:
           Copy-Item -Path ./publish_output/$shortName.pdb -Destination $targetPath/ -ErrorAction SilentlyContinue
           Copy-Item -Path ./publish_output/manifest.json -Destination $targetPath/ -ErrorAction SilentlyContinue
           Copy-Item -Path ./publish_output/SevenZipExtractor.pdb -Destination $targetPath/ -ErrorAction SilentlyContinue
-          Copy-Item -Path ./publish_output/Lib/7z.dll -Destination $targetPath/Lib/ -ErrorAction SilentlyContinue
+          Copy-Item -Path "./publish_output/Lib/*" -Destination "$targetPath/Lib/" -Recurse -Force -ErrorAction SilentlyContinue
           Copy-Item -Path ./publish_output/*.zip -Destination $targetPath/build/
 
       - name: Create Pull Request in Release Repo
@@ -200,7 +200,7 @@ jobs:
             - ${{ matrix.item.short }}.pdb
             - manifest.json
             - SevenZipExtractor.pdb
-            - Lib/7z.dll
+            - Lib/*
             - build/*.zip
           commit-message: 'Release ${{ matrix.item.short }} Plugin v${{ matrix.item.version }}'
           delete-branch: false

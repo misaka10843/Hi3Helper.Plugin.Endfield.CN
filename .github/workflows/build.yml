@@ -43,24 +43,24 @@ jobs:
       - name: Determine Build Matrix
         id: set-matrix
         run: |
-          # 获取Commit Message和PR标题，转为小写便于匹配
+          # retrieve the commit message and pull request title, then normalize both to lowercase to facilitate pattern matching.
           MSG=$(echo "${{ github.event.head_commit.message }} ${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')
           
-          # 如果修改了Core核心库，则全量编译
+          # if modified Core，all plugins builds
           if [[ "${{ steps.filter.outputs.core }}" == "true" ]] || [[ "$MSG" == *"(core)"* ]]; then
-            echo "🚀 检测到 Core 核心库修改，将并行编译所有插件！"
+            echo "Core modified, build all plugins"
             echo 'matrix=["Hi3Helper.Plugin.Endfield", "Hi3Helper.Plugin.Arknights"]' >> $GITHUB_OUTPUT
             exit 0
           fi
           
-          # 如果代码修改仅限Endfield
+          # if only modified Endfield
           if [[ "${{ steps.filter.outputs.endfield }}" == "true" ]] || [[ "$MSG" == *"(endfield)"* ]]; then
             echo "only build Endfield。"
             echo 'matrix=["Hi3Helper.Plugin.Endfield"]' >> $GITHUB_OUTPUT
             exit 0
           fi
           
-          # 如果代码修改仅限 Arknights
+          # if only modified Arknights
           if [[ "${{ steps.filter.outputs.arknights }}" == "true" ]] || [[ "$MSG" == *"(arknights)"* ]]; then
             echo "only build Arknights"
             echo 'matrix=["Hi3Helper.Plugin.Arknights"]' >> $GITHUB_OUTPUT

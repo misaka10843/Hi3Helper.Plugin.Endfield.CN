@@ -50,10 +50,10 @@ jobs:
           
           RESULT="[]"
           if [[ ("$SELECT" == "all" || "$SELECT" == "Hi3Helper.Plugin.Endfield") && -n "$END_VER" ]]; then
-            RESULT=$(echo $RESULT | jq '. += [{"name": "Hi3Helper.Plugin.Endfield", "short": "Endfield", "version": "'$END_VER'"}]')
+            RESULT=$(echo $RESULT | jq -c '. += [{"name": "Hi3Helper.Plugin.Endfield", "short": "Endfield", "version": "'$END_VER'"}]')
           fi
           if [[ ("$SELECT" == "all" || "$SELECT" == "Hi3Helper.Plugin.Arknights") && -n "$ARK_VER" ]]; then
-            RESULT=$(echo $RESULT | jq '. += [{"name": "Hi3Helper.Plugin.Arknights", "short": "Arknights", "version": "'$ARK_VER'"}]')
+            RESULT=$(echo $RESULT | jq -c '. += [{"name": "Hi3Helper.Plugin.Arknights", "short": "Arknights", "version": "'$ARK_VER'"}]')
           fi
           
           echo "matrix=$RESULT" >> $GITHUB_OUTPUT

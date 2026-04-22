@@ -5,12 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Hi3Helper.Hypergryph.Core.Management;
 using Hi3Helper.Plugin.Core.Management.PresetConfig;
 using Hi3Helper.Plugin.Core.Utility;
-using Hi3Helper.Hypergryph.Core.Management;
 using Microsoft.Extensions.Logging;
 
-namespace Hi3Helper.Plugin.Endfield;
+namespace Hi3Helper.Plugin.Arknights;
 
 public partial class Exports
 {
@@ -38,7 +38,7 @@ public partial class Exports
                 }
                 catch (Exception e)
                 {
-                    InstanceLogger.LogError(e, "[Endfield::LaunchGame] Failed to set process priority.");
+                    InstanceLogger.LogError(e, "[Arknights::LaunchGame] Failed to set process priority.");
                 }
 
                 _ = ReadGameLog(context, token);
@@ -139,10 +139,10 @@ public partial class Exports
         gameExecutablePath = null;
         if (context is not
             {
-                GameManager: HgGameManager endfieldManager, PresetConfig: PluginPresetConfigBase presetConfig
+                GameManager: HgGameManager hgManager, PresetConfig: PluginPresetConfigBase presetConfig
             }) return false;
 
-        endfieldManager.GetGamePath(out var gamePath);
+        hgManager.GetGamePath(out var gamePath);
         presetConfig.comGet_GameExecutableName(out var executablePath);
 
         gamePath?.NormalizePathInplace();
@@ -213,7 +213,7 @@ public partial class Exports
         }
         catch (Exception ex)
         {
-            InstanceLogger.LogWarning($"[Endfield::ReadGameLog] Stopped reading log: {ex.Message}");
+            InstanceLogger.LogWarning($"[Arknights::ReadGameLog] Stopped reading log: {ex.Message}");
         }
 
         return;

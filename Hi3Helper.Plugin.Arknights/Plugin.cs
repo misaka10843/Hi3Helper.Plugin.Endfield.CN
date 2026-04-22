@@ -1,36 +1,34 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices.Marshalling;
+using Hi3Helper.Plugin.Arknights.Management.PresetConfig;
+using Hi3Helper.Plugin.Arknights.Utils;
 using Hi3Helper.Plugin.Core;
 using Hi3Helper.Plugin.Core.Management.PresetConfig;
 using Hi3Helper.Plugin.Core.Update;
 using Hi3Helper.Plugin.Core.Utility;
-using Hi3Helper.Plugin.Endfield.Management.PresetConfig;
-using Hi3Helper.Plugin.Endfield.Utils;
-using Hi3Helper.Hypergryph.Core.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Hi3Helper.Plugin.Endfield;
+namespace Hi3Helper.Plugin.Arknights;
 
 [GeneratedComClass]
-public partial class EndfieldPlugin : PluginBase
+public partial class ArknightsPlugin : PluginBase
 {
     private static readonly IPluginPresetConfig[] PresetConfigInstances =
     [
-        new EndfieldCnPresetConfig(),
-        new EndfieldGlobalPresetConfig(),
-        new EndfieldBiliPresetConfig()
+        new ArknightsCnPresetConfig(),
+        new ArknightsBiliPresetConfig()
     ];
 
-    private static DateTime _pluginCreationDate = new(2026, 01, 27, 00, 00, 0, DateTimeKind.Utc);
+    private static DateTime _pluginCreationDate = new(2026, 02, 13, 00, 00, 0, DateTimeKind.Utc);
 
     public override void GetPluginName(out string result)
     {
-        result = "Arknights: Endfield Plugin";
+        result = "Arknights Plugin";
     }
 
     public override void GetPluginDescription(out string result)
     {
-        result = "A plugin for Arknights: Endfield in Collapse Launcher";
+        result = "A plugin for Arknights in Collapse Launcher";
     }
 
     public override void GetPluginAuthor(out string result)
@@ -50,7 +48,7 @@ public partial class EndfieldPlugin : PluginBase
 
     public override void GetPresetConfig(int index, out IPluginPresetConfig presetConfig)
     {
-        SharedStatic.InstanceLogger.LogInformation("[Endfield] Starting execution...");
+        SharedStatic.InstanceLogger.LogInformation("[Arknights] Starting execution...");
         if (index < 0 || index >= PresetConfigInstances.Length)
         {
             presetConfig = null!;
@@ -67,11 +65,11 @@ public partial class EndfieldPlugin : PluginBase
 
     public override void GetPluginAppIconUrl(out string result)
     {
-        result = Convert.ToBase64String(EndfieldImageData.EndfieldAppIconData);
+        result = Convert.ToBase64String(ArknightsImageData.ArknightsAppIconData);
     }
 
     public override void GetNotificationPosterUrl(out string result)
     {
-        result = Convert.ToBase64String(EndfieldImageData.EndfieldPosterData);
+        result = Convert.ToBase64String(ArknightsImageData.ArknightsPosterData);
     }
 }

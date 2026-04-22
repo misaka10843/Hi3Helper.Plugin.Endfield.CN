@@ -1,31 +1,31 @@
-﻿using Hi3Helper.Hypergryph.Core.Management;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices.Marshalling;
 using System.Threading;
 using System.Threading.Tasks;
+using Hi3Helper.Hypergryph.Core.Management;
+using Hi3Helper.Hypergryph.Core.Management.Api;
 using Hi3Helper.Plugin.Core.Management;
 using Hi3Helper.Plugin.Core.Management.Api;
 using Hi3Helper.Plugin.Core.Management.PresetConfig;
-using Hi3Helper.Hypergryph.Core.Management.Api;
 
-namespace Hi3Helper.Plugin.Endfield.Management.PresetConfig;
+namespace Hi3Helper.Plugin.Arknights.Management.PresetConfig;
 
 [GeneratedComClass]
-public partial class EndfieldBiliPresetConfig : PluginPresetConfigBase
+public partial class ArknightsBiliPresetConfig : PluginPresetConfigBase
 {
-    private const string ExEcutableName = "Endfield.exe";
+    private const string ExEcutableName = "Arknights.exe";
 
     private const string ExApiUrl = "https://launcher.hypergryph.com/api/proxy/batch_proxy";
     private const string ExWebApiUrl = "https://launcher.hypergryph.com/api/proxy/web/batch_proxy";
-    private const string ExAppCode = "6LL0KJuqHBVz33WK";
+    private const string ExAppCode = "GzD1CpaWgmSq1wew";
     private const string ExLauncherAppCode = "abYeZZ16BPluCFyT";
     private const string ExChannel = "2";
     private const string ExSubChannel = "2";
     private const string ExSeq = "5";
 
-    [field: AllowNull] [field: MaybeNull] public override string GameName => field ??= "Arknights: Endfield";
+    [field: AllowNull] [field: MaybeNull] public override string GameName => field ??= "Arknights";
     [field: AllowNull] [field: MaybeNull] public override string GameExecutableName => field ??= ExEcutableName;
 
     public override string GameAppDataPath
@@ -34,7 +34,7 @@ public partial class EndfieldBiliPresetConfig : PluginPresetConfigBase
         {
             string? gamePath = null;
             GameManager?.GetGamePath(out gamePath);
-            if (!string.IsNullOrEmpty(gamePath)) return Path.Combine(gamePath, "Endfield_Data");
+            if (!string.IsNullOrEmpty(gamePath)) return Path.Combine(gamePath, "Arknights_Data");
             return string.Empty;
         }
     }
@@ -42,21 +42,19 @@ public partial class EndfieldBiliPresetConfig : PluginPresetConfigBase
     [field: AllowNull] [field: MaybeNull] public override string GameLogFileName => field ??= null!;
 
     [field: AllowNull] [field: MaybeNull] public override string GameVendorName => field ??= "Hypergryph";
-    [field: AllowNull] [field: MaybeNull] public override string GameRegistryKeyName => field ??= "Endfield";
-    [field: AllowNull] [field: MaybeNull] public override string ProfileName => field ??= "EndfieldBili";
+    [field: AllowNull] [field: MaybeNull] public override string GameRegistryKeyName => field ??= "Arknights";
+    [field: AllowNull] [field: MaybeNull] public override string ProfileName => field ??= "ArknightsBili";
 
-    [field: AllowNull]
-    [field: MaybeNull]
-    public override string ZoneDescription => field ??= "《明日方舟：终末地》是一款由鹰角网络出品的3D即时策略RPG。";
+    [field: AllowNull] [field: MaybeNull] public override string ZoneDescription => field ??= "《明日方舟》是一款魔物主题的策略手游。";
 
     [field: AllowNull] [field: MaybeNull] public override string ZoneName => field ??= "Bilibili";
-    [field: AllowNull] [field: MaybeNull] public override string ZoneFullName => field ??= "明日方舟：终末地 (Bilibili)";
+    [field: AllowNull] [field: MaybeNull] public override string ZoneFullName => field ??= "明日方舟 (Bilibili)";
     [field: AllowNull] [field: MaybeNull] public override string ZoneLogoUrl => field ??= "";
     [field: AllowNull] [field: MaybeNull] public override string ZonePosterUrl => field ??= "";
 
     [field: AllowNull]
     [field: MaybeNull]
-    public override string ZoneHomePageUrl => field ??= "https://endfield.hypergryph.com/";
+    public override string ZoneHomePageUrl => field ??= "https://ak.hypergryph.com/";
 
     public override GameReleaseChannel ReleaseChannel => GameReleaseChannel.Public;
 
@@ -64,7 +62,7 @@ public partial class EndfieldBiliPresetConfig : PluginPresetConfigBase
 
     [field: AllowNull]
     [field: MaybeNull]
-    public override string LauncherGameDirectoryName => field ??= "Arknights Endfield Game";
+    public override string LauncherGameDirectoryName => field ??= "Arknights Game";
 
     [field: AllowNull] [field: MaybeNull] public override List<string> SupportedLanguages => field ??= ["Chinese"];
 

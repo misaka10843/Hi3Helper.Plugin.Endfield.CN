@@ -3,12 +3,12 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Hi3Helper.Plugin.Endfield.Utils;
+namespace Hi3Helper.Hypergryph.Core.Utils;
 
 /// <summary>
-///     Provides AES-256-CBC decryption for Endfield game files (e.g., config.ini, game_files).
+///     Provides AES-256-CBC decryption for Hg game files (e.g., config.ini, game_files).
 /// </summary>
-public static class EndfieldCrypto
+public static class HgCrypto
 {
     // AES-256-CBC Key retrieved via reverse engineering
     private static readonly byte[] AesKey = new byte[]

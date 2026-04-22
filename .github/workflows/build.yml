@@ -1,74 +1,101 @@
-name: Build and Publish Plugin
+name: Build Plugins
 
 on:
   push:
-    branches: [main]
+    branches: [ "main" ]
     paths-ignore:
-      - '*.md'
-      - '.github/workflows/*.yaml'
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+      - '.github/assets/**'
+      - '.github/ISSUE_TEMPLATE/**'
   pull_request:
-    branches: [main]
-  workflow_dispatch:
-    inputs:
-      publish_profile:
-        description: 'Publish profile to use'
-        required: true
-        type: choice
-        options:
-          - ReleaseNoReflectionPublish-O1
-          - ReleaseNoReflectionPublish-O2
-          - ReleasePublish-O1
-          - ReleasePublish-O2
-          - DebugPublish
-          - DebugNoReflectionPublish
-        default: ReleaseNoReflectionPublish-O1
-
-permissions:
-  id-token: write
-  contents: read
-  attestations: write
-
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+      - '.github/assets/**'
+      - '.github/ISSUE_TEMPLATE/**'
 jobs:
+  prepare:
+    if: contains(github.event.head_commit.message, '[ci]') || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changed files
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            core:
+              - 'Hi3Helper.Hypergryph.Core/**'
+              - '.github/workflows/**'
+            endfield:
+              - 'Hi3Helper.Plugin.Endfield/**'
+            arknights:
+              - 'Hi3Helper.Plugin.Arknights/**'
+
+      - name: Determine Build Matrix
+        id: set-matrix
+        run: |
+          # retrieve the commit message and pull request title, then normalize both to lowercase to facilitate pattern matching.
+          MSG=$(echo "${{ github.event.head_commit.message }} ${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')
+          
+          # if modified Core，all plugins builds
+          if [[ "${{ steps.filter.outputs.core }}" == "true" ]] || [[ "$MSG" == *"(core)"* ]]; then
+            echo "Core modified, build all plugins"
+            echo 'matrix=["Hi3Helper.Plugin.Endfield", "Hi3Helper.Plugin.Arknights"]' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # if only modified Endfield
+          if [[ "${{ steps.filter.outputs.endfield }}" == "true" ]] || [[ "$MSG" == *"(endfield)"* ]]; then
+            echo "only build Endfield。"
+            echo 'matrix=["Hi3Helper.Plugin.Endfield"]' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # if only modified Arknights
+          if [[ "${{ steps.filter.outputs.arknights }}" == "true" ]] || [[ "$MSG" == *"(arknights)"* ]]; then
+            echo "only build Arknights"
+            echo 'matrix=["Hi3Helper.Plugin.Arknights"]' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "All build"
+          echo 'matrix=["Hi3Helper.Plugin.Endfield", "Hi3Helper.Plugin.Arknights"]' >> $GITHUB_OUTPUT
+
   build:
+    needs: prepare
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: ${{ fromJson(needs.prepare.outputs.matrix) }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: 'recursive'
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+      - name: Setup .NET 10.0
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: 10.0.x
 
-      - name: Set publish profile
-        shell: pwsh
+      - name: Restore and Build ${{ matrix.plugin }}
         run: |
-          if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
-            $profile = '${{ inputs.publish_profile }}'
-          } else {
-            $profile = 'ReleaseNoReflectionPublish-O1'
-          }
-          echo "PUBLISH_PROFILE=$profile" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          dotnet restore ${{ matrix.plugin }}/${{ matrix.plugin }}.csproj
+          dotnet build ${{ matrix.plugin }}/${{ matrix.plugin }}.csproj -c Release --no-restore
 
-      - name: Restore dependencies
-        run: dotnet restore Hi3Helper.Plugin.Endfield.sln
-
-      - name: Build solution
-        run: dotnet build --configuration Release Hi3Helper.Plugin.Endfield.sln --no-restore
-
-      - name: Publish with selected profile
-        run: dotnet publish Hi3Helper.Plugin.Endfield/Hi3Helper.Plugin.Endfield.csproj --configuration Release --runtime win-x64 /p:PublishProfile=$PUBLISH_PROFILE -o ./publish
-
-      - name: Generate build provenance
-        uses: actions/attest-build-provenance@v1
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          subject-path: './publish/**'
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: plugin-build
-          path: ./publish/
+          name: ${{ matrix.plugin }}-Release
+          path: ${{ matrix.plugin }}/bin/Release/net10.0/

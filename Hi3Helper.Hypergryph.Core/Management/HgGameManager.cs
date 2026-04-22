@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,14 +9,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Hi3Helper.Plugin.Core;
 using Hi3Helper.Plugin.Core.Management;
-using Hi3Helper.Plugin.Endfield.Management.Api;
-using Hi3Helper.Plugin.Endfield.Utils;
+using Hi3Helper.Hypergryph.Core.Management.Api;
+using Hi3Helper.Hypergryph.Core.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Hi3Helper.Plugin.Endfield.Management;
+namespace Hi3Helper.Hypergryph.Core.Management;
 
 [GeneratedComClass]
-internal partial class EndfieldGameManager : GameManagerBase
+public partial class HgGameManager : GameManagerBase
 {
     private readonly string _apiUrl;
     private readonly string _appCode;
@@ -26,9 +26,9 @@ internal partial class EndfieldGameManager : GameManagerBase
     private readonly string _subChannel;
     private readonly string _webApiUrl;
 
-    private EndfieldGetLatestGameRsp? _latestGameInfo;
+    private HgGetLatestGameRsp? _latestGameInfo;
 
-    internal EndfieldGameManager(string gameExecutableNameByPreset, string apiUrl, string webApiUrl, string appCode,
+    public HgGameManager(string gameExecutableNameByPreset, string apiUrl, string webApiUrl, string appCode,
         string launcherAppCode, string channel, string subChannel, string seq)
     {
         CurrentGameExecutableByPreset = gameExecutableNameByPreset;
@@ -51,18 +51,18 @@ internal partial class EndfieldGameManager : GameManagerBase
     internal string? PatchManifestUrl => _latestGameInfo?.Patch?.V2PatchInfoUrl;
     internal string? TargetVersion => _latestGameInfo?.Version;
 
-    internal List<EndfieldPack>? GamePacks
+    internal List<HgPack>? GamePacks
     {
         get
         {
             if (IsDeltaUpdate)
             {
                 SharedStatic.InstanceLogger.LogInformation(
-                    "[Endfield] Delta update detected, exposing Patch packs.");
+                    "[HgCore] Delta update detected, exposing Patch packs.");
                 return _latestGameInfo!.Patch!.Patches;
             }
 
-            SharedStatic.InstanceLogger.LogInformation("[Endfield] Full package detected.");
+            SharedStatic.InstanceLogger.LogInformation("[HgCore] Full package detected.");
             return _latestGameInfo?.Pkg?.Packs;
         }
     }
@@ -100,7 +100,7 @@ internal partial class EndfieldGameManager : GameManagerBase
 
     protected override void SetGamePathInner(string gamePath)
     {
-        SharedStatic.InstanceLogger.LogInformation($"[Endfield] SetGamePathInner called! Input path: '{gamePath}'");
+        SharedStatic.InstanceLogger.LogInformation($"[HgCore] SetGamePathInner called! Input path: '{gamePath}'");
         CurrentGameInstallPath = gamePath;
 
         _latestGameInfo = null;
@@ -111,12 +111,12 @@ internal partial class EndfieldGameManager : GameManagerBase
                 try
                 {
                     SharedStatic.InstanceLogger.LogInformation(
-                        "[Endfield] Path updated, triggering re-initialization...");
+                        "[HgCore] Path updated, triggering re-initialization...");
                     await InitAsyncInner(true);
                 }
                 catch (Exception ex)
                 {
-                    SharedStatic.InstanceLogger.LogError($"[Endfield]Re-initialization failed: {ex}");
+                    SharedStatic.InstanceLogger.LogError($"[HgCore]Re-initialization failed: {ex}");
                 }
             });
     }
@@ -128,7 +128,7 @@ internal partial class EndfieldGameManager : GameManagerBase
         var requestVersion = "";
 
         SharedStatic.InstanceLogger.LogInformation(
-            $"[Endfield] InitAsyncInner started. Current path: '{CurrentGameInstallPath}'");
+            $"[HgCore] InitAsyncInner started. Current path: '{CurrentGameInstallPath}'");
 
         if (IsInstalled)
             try
@@ -136,7 +136,7 @@ internal partial class EndfieldGameManager : GameManagerBase
                 var configPath = Path.Combine(CurrentGameInstallPath!, "config.ini");
                 if (File.Exists(configPath))
                 {
-                    SharedStatic.InstanceLogger.LogInformation($"[Endfield] Config file found: {configPath}");
+                    SharedStatic.InstanceLogger.LogInformation($"[HgCore] Config file found: {configPath}");
                     var iniContent = ConfigTool.ReadConfig(configPath);
                     var ver = ConfigTool.ParseVersion(iniContent);
                     if (!string.IsNullOrEmpty(ver))
@@ -144,27 +144,27 @@ internal partial class EndfieldGameManager : GameManagerBase
                         requestVersion = ver!;
                         CurrentGameVersion = new GameVersion(requestVersion);
                         SharedStatic.InstanceLogger.LogInformation(
-                            $"[Endfield] Successfully read local version: {requestVersion}");
+                            $"[HgCore] Successfully read local version: {requestVersion}");
                     }
                 }
             }
             catch (Exception ex)
             {
                 SharedStatic.InstanceLogger.LogError(
-                    $"[Endfield] Exception occurred while reading local configuration: {ex}");
+                    $"[HgCore] Exception occurred while reading local configuration: {ex}");
             }
         else
-            SharedStatic.InstanceLogger.LogWarning("[Endfield] No installation detected; version set to empty.");
+            SharedStatic.InstanceLogger.LogWarning("[HgCore] No installation detected; version set to empty.");
 
-        var requestBody = new EndfieldBatchRequest
+        var requestBody = new HgBatchRequest
         {
             Seq = _seq,
-            ProxyReqs = new List<EndfieldProxyRequest>
+            ProxyReqs = new List<HgProxyRequest>
             {
                 new()
                 {
                     Kind = "get_latest_game",
-                    GetLatestGameReq = new EndfieldGetLatestGameReq
+                    GetLatestGameReq = new HgGetLatestGameReq
                     {
                         AppCode = _appCode,
                         LauncherAppCode = _launcherAppCode,
@@ -179,22 +179,22 @@ internal partial class EndfieldGameManager : GameManagerBase
         try
         {
             using var response = await ApiResponseHttpClient!.PostAsJsonAsync(_apiUrl, requestBody,
-                EndfieldApiContext.Default.EndfieldBatchRequest, token);
+                HgApiContext.Default.HgBatchRequest, token);
             response.EnsureSuccessStatusCode();
 
             var responseBody =
-                await response.Content.ReadFromJsonAsync(EndfieldApiContext.Default.EndfieldBatchResponse, token);
+                await response.Content.ReadFromJsonAsync(HgApiContext.Default.HgBatchResponse, token);
             _latestGameInfo = responseBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_latest_game")
                 ?.GetLatestGameRsp;
 
             if (_latestGameInfo == null)
             {
-                SharedStatic.InstanceLogger.LogError("[Endfield] API data error: get_latest_game_rsp is null.");
+                SharedStatic.InstanceLogger.LogError("[HgCore] API data error: get_latest_game_rsp is null.");
                 return -1;
             }
 
             SharedStatic.InstanceLogger.LogInformation(
-                $"[Endfield] API Response - Action: {_latestGameInfo.Action}, Version: {_latestGameInfo.Version}");
+                $"[HgCore] API Response - Action: {_latestGameInfo.Action}, Version: {_latestGameInfo.Version}");
 
             if (!string.IsNullOrEmpty(_latestGameInfo.Version))
                 ApiGameVersion = new GameVersion(_latestGameInfo.Version);
@@ -205,7 +205,7 @@ internal partial class EndfieldGameManager : GameManagerBase
         }
         catch (Exception ex)
         {
-            SharedStatic.InstanceLogger.LogError($"[Endfield] API request failed: {ex}");
+            SharedStatic.InstanceLogger.LogError($"[HgCore] API request failed: {ex}");
             return -1;
         }
 

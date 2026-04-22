@@ -16,10 +16,10 @@ using Hi3Helper.Plugin.Core.Management.Api;
 using Hi3Helper.Plugin.Core.Utility;
 using Microsoft.Extensions.Logging;
 
-namespace Hi3Helper.Plugin.Endfield.Management.Api;
+namespace Hi3Helper.Hypergryph.Core.Management.Api;
 
 [GeneratedComClass]
-public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
+public partial class HgLauncherApiNews : LauncherApiNewsBase
 {
     private readonly string _appCode;
     private readonly string _channel;
@@ -27,11 +27,11 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
     private readonly string _subChannel;
     private readonly string _webApiUrl;
 
-    private EndfieldGetBannerRsp? _bannerResponse;
-    private EndfieldGetAnnouncementRsp? _newsResponse;
-    private EndfieldGetSidebarRsp? _sidebarResponse;
+    private HgGetBannerRsp? _bannerResponse;
+    private HgGetAnnouncementRsp? _newsResponse;
+    private HgGetSidebarRsp? _sidebarResponse;
 
-    public EndfieldLauncherApiNews(string webApiUrl, string appCode, string channel, string subChannel, string seq)
+    public HgLauncherApiNews(string webApiUrl, string appCode, string channel, string subChannel, string seq)
     {
         _webApiUrl = webApiUrl;
         _appCode = appCode;
@@ -59,44 +59,44 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
 
     protected override async Task<int> InitAsync(CancellationToken token)
     {
-        var requestBody = new EndfieldBatchRequest
+        var requestBody = new HgBatchRequest
         {
             Seq = _seq,
             ProxyReqs = new[]
             {
-                new EndfieldProxyRequest { Kind = "get_announcement", GetAnnouncementReq = CreateCommonReq() },
-                new EndfieldProxyRequest { Kind = "get_banner", GetBannerReq = CreateCommonReq() },
-                new EndfieldProxyRequest { Kind = "get_sidebar", GetSidebarReq = CreateCommonReq() }
+                new HgProxyRequest { Kind = "get_announcement", GetAnnouncementReq = CreateCommonReq() },
+                new HgProxyRequest { Kind = "get_banner", GetBannerReq = CreateCommonReq() },
+                new HgProxyRequest { Kind = "get_sidebar", GetSidebarReq = CreateCommonReq() }
             }.ToList()
         };
 
         try
         {
-            var jsonRequest = JsonSerializer.Serialize(requestBody, EndfieldApiContext.Default.EndfieldBatchRequest);
-            SharedStatic.InstanceLogger.LogDebug($"[EndfieldNews] Request Body:\n{jsonRequest}");
+            var jsonRequest = JsonSerializer.Serialize(requestBody, HgApiContext.Default.HgBatchRequest);
+            SharedStatic.InstanceLogger.LogDebug($"[HgNews] Request Body:\n{jsonRequest}");
 
             using var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
             using var response = await ApiResponseHttpClient.PostAsync(_webApiUrl, content, token);
 
-            SharedStatic.InstanceLogger.LogDebug($"[EndfieldNews] API Response Code: {response.StatusCode}");
+            SharedStatic.InstanceLogger.LogDebug($"[HgNews] API Response Code: {response.StatusCode}");
             response.EnsureSuccessStatusCode();
 
             var jsonResponse = await response.Content.ReadAsStringAsync(token);
-            SharedStatic.InstanceLogger.LogDebug($"[EndfieldNews] Response Body:\n{jsonResponse}");
+            SharedStatic.InstanceLogger.LogDebug($"[HgNews] Response Body:\n{jsonResponse}");
 
-            var rspBody = JsonSerializer.Deserialize(jsonResponse, EndfieldApiContext.Default.EndfieldBatchResponse);
+            var rspBody = JsonSerializer.Deserialize(jsonResponse, HgApiContext.Default.HgBatchResponse);
 
             _newsResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_announcement")?.GetAnnouncementRsp;
             _bannerResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_banner")?.GetBannerRsp;
             _sidebarResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_sidebar")?.GetSidebarRsp;
 
             SharedStatic.InstanceLogger.LogDebug(
-                $"[EndfieldNews] Parsed responses: News={_newsResponse != null}, Banner={_bannerResponse != null}, Sidebar={_sidebarResponse != null}");
+                $"[HgNews] Parsed responses: News={_newsResponse != null}, Banner={_bannerResponse != null}, Sidebar={_sidebarResponse != null}");
             return 0;
         }
         catch (Exception ex)
         {
-            SharedStatic.InstanceLogger.LogError($"[EndfieldNews] Failed to init news: {ex}");
+            SharedStatic.InstanceLogger.LogError($"[HgNews] Failed to init news: {ex}");
             return -1;
         }
     }
@@ -239,17 +239,17 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
         PluginDisposableMemory<byte> fileChecksum, PluginFiles.FileReadProgressDelegate? downloadProgress,
         CancellationToken token)
     {
-        SharedStatic.InstanceLogger.LogDebug($"[EndfieldNews] Downloading asset: {fileUrl}");
+        SharedStatic.InstanceLogger.LogDebug($"[HgNews] Downloading asset: {fileUrl}");
         try
         {
             await base.DownloadAssetAsyncInner(ApiDownloadHttpClient, fileUrl, outputStream, fileChecksum,
                 downloadProgress, token);
             SharedStatic.InstanceLogger.LogDebug(
-                $"[EndfieldNews] Download COMPLETED: {fileUrl} (Size: {outputStream.Length} bytes)");
+                $"[HgNews] Download COMPLETED: {fileUrl} (Size: {outputStream.Length} bytes)");
         }
         catch (Exception ex)
         {
-            SharedStatic.InstanceLogger.LogError($"[EndfieldNews] Download FAILED: {fileUrl}\nException: {ex}");
+            SharedStatic.InstanceLogger.LogError($"[HgNews] Download FAILED: {fileUrl}\nException: {ex}");
         }
     }
 
@@ -269,9 +269,9 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
         base.Dispose();
     }
 
-    private EndfieldCommonReq CreateCommonReq()
+    private HgCommonReq CreateCommonReq()
     {
-        return new EndfieldCommonReq
+        return new HgCommonReq
         {
             AppCode = _appCode,
             Channel = _channel,
@@ -282,7 +282,7 @@ public partial class EndfieldLauncherApiNews : LauncherApiNewsBase
 
     private struct FlatNewsItem
     {
-        public EndfieldAnnouncement Item;
+        public HgAnnouncement Item;
         public string TypeName;
     }
 }

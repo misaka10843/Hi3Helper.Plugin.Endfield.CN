@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -10,31 +10,29 @@
         <DebugType>embedded</DebugType>
         <Deterministic>true</Deterministic>
         <LangVersion>preview</LangVersion>
-        <AssemblyName>Endfield</AssemblyName>
-        <ProductName>Arknights: Endfield Plugin</ProductName>
+        <AssemblyName>Hypergryph.Core</AssemblyName>
+        <ProductName>Hypergryph Core Plugin Library</ProductName>
         <Product>Collapse</Product>
-        <Description>This library is a plugin for adding support for the game "Arknights: Endfield" into Collapse Launcher</Description>
-        <AssemblyTitle>Arknights: Endfield Plugin</AssemblyTitle>
+        <Description>This library contains the common core functionality for Hypergryph game plugins in Collapse Launcher</Description>
+        <AssemblyTitle>Hypergryph Core Library</AssemblyTitle>
         <Company>Misaka10843</Company>
         <Authors>$(Company).</Authors>
         <Copyright>Copyright 2026 $(Company)</Copyright>
-        <Version>0.1.4</Version>
-        <ApplicationIcon>icon.ico</ApplicationIcon>
+        <Version>1.0.0</Version>
         <Configurations>Debug;Release</Configurations>
-        <Title>Hi3Helper.Plugin.Endfield</Title>
+        <Title>Hi3Helper.Hypergryph.Core</Title>
         <PackageProjectUrl>https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/releases</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/misaka10843/Hi3Helper.Plugin.Endfield/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/misaka10843/Hi3Helper.Plugin.Endfield</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Hi3Helper.Plugin.Core\Hi3Helper.Plugin.Core.csproj" />
-        <ProjectReference Include="..\SevenZipExtractor\SevenZipExtractor\SevenZipExtractor.csproj" />
-        <ProjectReference Include="..\SharpHDiffPatch.Core\SharpHDiffPatch.Core.csproj" />
-        <ProjectReference Include="..\Hi3Helper.Hypergryph.Core\Hi3Helper.Hypergryph.Core.csproj" />
+        <ProjectReference Include="..\Hi3Helper.Plugin.Core\Hi3Helper.Plugin.Core.csproj"/>
+        <ProjectReference Include="..\SevenZipExtractor\SevenZipExtractor\SevenZipExtractor.csproj"/>
+        <ProjectReference Include="..\SharpHDiffPatch.Core\SharpHDiffPatch.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.IO.Hashing" Version="10.0.1" />
+        <PackageReference Include="System.IO.Hashing" Version="10.0.1"/>
     </ItemGroup>
 </Project>

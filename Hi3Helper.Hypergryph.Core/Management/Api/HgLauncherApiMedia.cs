@@ -14,10 +14,10 @@ using Hi3Helper.Plugin.Core.Management.Api;
 using Hi3Helper.Plugin.Core.Utility;
 using Microsoft.Extensions.Logging;
 
-namespace Hi3Helper.Plugin.Endfield.Management.Api;
+namespace Hi3Helper.Hypergryph.Core.Management.Api;
 
 [GeneratedComClass]
-public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
+public partial class HgLauncherApiMedia : LauncherApiMediaBase
 {
     private readonly string _appCode;
     private readonly string _channel;
@@ -25,9 +25,9 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
     private readonly string _subChannel;
     private readonly string _webApiUrl;
 
-    private EndfieldGetMainBgImageRsp? _bgResponse;
+    private HgGetMainBgImageRsp? _bgResponse;
 
-    public EndfieldLauncherApiMedia(string webApiUrl, string appCode, string channel, string subChannel, string seq)
+    public HgLauncherApiMedia(string webApiUrl, string appCode, string channel, string subChannel, string seq)
     {
         _webApiUrl = webApiUrl;
         _appCode = appCode;
@@ -55,39 +55,39 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
 
     protected override async Task<int> InitAsync(CancellationToken token)
     {
-        var requestBody = new EndfieldBatchRequest
+        var requestBody = new HgBatchRequest
         {
             Seq = _seq,
             ProxyReqs = new[]
             {
-                new EndfieldProxyRequest { Kind = "get_main_bg_image", GetMainBgImageReq = CreateCommonReq() }
+                new HgProxyRequest { Kind = "get_main_bg_image", GetMainBgImageReq = CreateCommonReq() }
             }.ToList()
         };
 
         try
         {
-            var jsonRequest = JsonSerializer.Serialize(requestBody, EndfieldApiContext.Default.EndfieldBatchRequest);
-            SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Request Body:\n{jsonRequest}");
+            var jsonRequest = JsonSerializer.Serialize(requestBody, HgApiContext.Default.HgBatchRequest);
+            SharedStatic.InstanceLogger.LogDebug($"[HgMedia] Request Body:\n{jsonRequest}");
 
             using var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
             using var response = await ApiResponseHttpClient.PostAsync(_webApiUrl, content, token);
 
-            SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] API Response Code: {response.StatusCode}");
+            SharedStatic.InstanceLogger.LogDebug($"[HgMedia] API Response Code: {response.StatusCode}");
             response.EnsureSuccessStatusCode();
 
             var jsonResponse = await response.Content.ReadAsStringAsync(token);
-            SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Response Body:\n{jsonResponse}");
+            SharedStatic.InstanceLogger.LogDebug($"[HgMedia] Response Body:\n{jsonResponse}");
 
-            var rspBody = JsonSerializer.Deserialize(jsonResponse, EndfieldApiContext.Default.EndfieldBatchResponse);
+            var rspBody = JsonSerializer.Deserialize(jsonResponse, HgApiContext.Default.HgBatchResponse);
 
             _bgResponse = rspBody?.ProxyRsps?.FirstOrDefault(x => x.Kind == "get_main_bg_image")?.GetMainBgImageRsp;
             SharedStatic.InstanceLogger.LogDebug(
-                $"[EndfieldMedia] Background URL: {_bgResponse?.MainBgImage?.Url}, Video: {_bgResponse?.MainBgImage?.VideoUrl}");
+                $"[HgMedia] Background URL: {_bgResponse?.MainBgImage?.Url}, Video: {_bgResponse?.MainBgImage?.VideoUrl}");
             return 0;
         }
         catch (Exception ex)
         {
-            SharedStatic.InstanceLogger.LogError($"[EndfieldMedia] Failed to init media: {ex}");
+            SharedStatic.InstanceLogger.LogError($"[HgMedia] Failed to init media: {ex}");
             return -1;
         }
     }
@@ -100,7 +100,7 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
             : _bgResponse?.MainBgImage?.Url;
 
         SharedStatic.InstanceLogger.LogDebug(
-            $"[EndfieldMedia] Background image: {_bgResponse?.MainBgImage?.Url}, Background video: {_bgResponse?.MainBgImage?.VideoUrl}");
+            $"[HgMedia] Background image: {_bgResponse?.MainBgImage?.Url}, Background video: {_bgResponse?.MainBgImage?.VideoUrl}");
 
         if (string.IsNullOrEmpty(url))
         {
@@ -151,17 +151,17 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
         PluginDisposableMemory<byte> fileChecksum, PluginFiles.FileReadProgressDelegate? downloadProgress,
         CancellationToken token)
     {
-        SharedStatic.InstanceLogger.LogDebug($"[EndfieldMedia] Downloading background: {fileUrl}");
+        SharedStatic.InstanceLogger.LogDebug($"[HgMedia] Downloading background: {fileUrl}");
         try
         {
             await base.DownloadAssetAsyncInner(ApiDownloadHttpClient, fileUrl, outputStream, fileChecksum,
                 downloadProgress, token);
-            SharedStatic.InstanceLogger.LogDebug("[EndfieldMedia] Background download COMPLETED.");
+            SharedStatic.InstanceLogger.LogDebug("[HgMedia] Background download COMPLETED.");
         }
         catch (Exception ex)
         {
             SharedStatic.InstanceLogger.LogError(
-                $"[EndfieldMedia] Background download FAILED: {fileUrl}\nException: {ex}");
+                $"[HgMedia] Background download FAILED: {fileUrl}\nException: {ex}");
         }
     }
 
@@ -173,9 +173,9 @@ public partial class EndfieldLauncherApiMedia : LauncherApiMediaBase
         base.Dispose();
     }
 
-    private EndfieldCommonReq CreateCommonReq()
+    private HgCommonReq CreateCommonReq()
     {
-        return new EndfieldCommonReq
+        return new HgCommonReq
         {
             AppCode = _appCode,
             Channel = _channel,

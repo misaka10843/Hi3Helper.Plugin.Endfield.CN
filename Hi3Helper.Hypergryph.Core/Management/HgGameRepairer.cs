@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,19 +13,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Hi3Helper.Plugin.Core;
 using Hi3Helper.Plugin.Core.Management;
-using Hi3Helper.Plugin.Endfield.Management.Api;
-using Hi3Helper.Plugin.Endfield.Utils;
+using Hi3Helper.Hypergryph.Core.Management.Api;
+using Hi3Helper.Hypergryph.Core.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Hi3Helper.Plugin.Endfield.Management;
+namespace Hi3Helper.Hypergryph.Core.Management;
 
-internal class EndfieldGameRepairer
+public class HgGameRepairer
 {
     private readonly HttpClient _httpClient;
     private readonly string _installPath;
-    private readonly EndfieldGameManager _manager;
+    private readonly HgGameManager _manager;
 
-    public EndfieldGameRepairer(HttpClient httpClient, EndfieldGameManager manager, string installPath)
+    public HgGameRepairer(HttpClient httpClient, HgGameManager manager, string installPath)
     {
         _httpClient = httpClient;
         _manager = manager;
@@ -39,7 +39,7 @@ internal class EndfieldGameRepairer
         if (string.IsNullOrEmpty(baseUrl))
         {
             SharedStatic.InstanceLogger.LogWarning(
-                "[EndfieldRepairer] GameResourceBaseUrl is missing. Skipping repair.");
+                "[HgRepairer] GameResourceBaseUrl is missing. Skipping repair.");
             return;
         }
 
@@ -59,7 +59,7 @@ internal class EndfieldGameRepairer
         if (File.Exists(localManifestPath))
         {
             SharedStatic.InstanceLogger.LogInformation(
-                "[EndfieldRepairer] Found local game_files. Reading from disk...");
+                "[HgRepairer] Found local game_files. Reading from disk...");
             try
             {
                 encryptedManifest = await File.ReadAllBytesAsync(localManifestPath, token);
@@ -67,7 +67,7 @@ internal class EndfieldGameRepairer
             catch (Exception ex)
             {
                 SharedStatic.InstanceLogger.LogWarning(
-                    $"[EndfieldRepairer] Failed to read local game_files: {ex.Message}. Falling back to CDN...");
+                    $"[HgRepairer] Failed to read local game_files: {ex.Message}. Falling back to CDN...");
             }
         }
 
@@ -75,7 +75,7 @@ internal class EndfieldGameRepairer
         {
             var manifestUrl = $"{baseUrl}/game_files";
             SharedStatic.InstanceLogger.LogInformation(
-                $"[EndfieldRepairer] Downloading game_files manifest from CDN: {manifestUrl}");
+                $"[HgRepairer] Downloading game_files manifest from CDN: {manifestUrl}");
             try
             {
                 encryptedManifest = await _httpClient.GetByteArrayAsync(manifestUrl, token);
@@ -83,19 +83,19 @@ internal class EndfieldGameRepairer
             }
             catch (Exception ex)
             {
-                SharedStatic.InstanceLogger.LogError($"[EndfieldRepairer] Failed to download game_files: {ex.Message}");
+                SharedStatic.InstanceLogger.LogError($"[HgRepairer] Failed to download game_files: {ex.Message}");
                 return;
             }
         }
 
-        var decryptedManifest = EndfieldCrypto.DecryptBytesToString(encryptedManifest);
+        var decryptedManifest = HgCrypto.DecryptBytesToString(encryptedManifest);
         if (string.IsNullOrEmpty(decryptedManifest))
         {
-            SharedStatic.InstanceLogger.LogError("[EndfieldRepairer] Failed to decrypt game_files. Wrong AES Key?");
+            SharedStatic.InstanceLogger.LogError("[HgRepairer] Failed to decrypt game_files. Wrong AES Key?");
             return;
         }
 
-        var manifestNodes = new List<EndfieldManifestNode>();
+        var manifestNodes = new List<HgManifestNode>();
         using (var reader = new StringReader(decryptedManifest))
         {
             string? line;
@@ -104,7 +104,7 @@ internal class EndfieldGameRepairer
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 try
                 {
-                    var node = JsonSerializer.Deserialize(line, EndfieldApiContext.Default.EndfieldManifestNode);
+                    var node = JsonSerializer.Deserialize(line, HgApiContext.Default.HgManifestNode);
                     if (node != null && !string.IsNullOrEmpty(node.Path))
                     {
                         if (node.Path.Equals("config.ini", StringComparison.OrdinalIgnoreCase)) continue;
@@ -114,7 +114,7 @@ internal class EndfieldGameRepairer
                 }
                 catch (Exception ex)
                 {
-                    SharedStatic.InstanceLogger.LogDebug($"[EndfieldRepairer] JSON line parse skipped: {ex.Message}");
+                    SharedStatic.InstanceLogger.LogDebug($"[HgRepairer] JSON line parse skipped: {ex.Message}");
                 }
             }
         }
@@ -123,7 +123,7 @@ internal class EndfieldGameRepairer
 
         var totalVerifyBytes = manifestNodes.Sum(n => n.Size);
         SharedStatic.InstanceLogger.LogInformation(
-            $"[EndfieldRepairer] Verifying {manifestNodes.Count} local files...");
+            $"[HgRepairer] Verifying {manifestNodes.Count} local files...");
 
         progress.TotalCountToDownload = manifestNodes.Count;
         progress.DownloadedCount = 0;
@@ -133,7 +133,7 @@ internal class EndfieldGameRepairer
         progress.StateCount = 0;
         Report(InstallProgressState.Verify);
 
-        var brokenFiles = new ConcurrentBag<EndfieldManifestNode>();
+        var brokenFiles = new ConcurrentBag<HgManifestNode>();
         long brokenSize = 0;
 
         await Parallel.ForEachAsync(manifestNodes,
@@ -164,13 +164,13 @@ internal class EndfieldGameRepairer
         if (downloadList.Count == 0)
         {
             SharedStatic.InstanceLogger.LogInformation(
-                "[EndfieldRepairer] Verification Passed: All files are perfect.");
+                "[HgRepairer] Verification Passed: All files are perfect.");
             return;
         }
 
 
         SharedStatic.InstanceLogger.LogInformation(
-            $"[EndfieldRepairer] Found {downloadList.Count} missing/corrupted files. Initiating download...");
+            $"[HgRepairer] Found {downloadList.Count} missing/corrupted files. Initiating download...");
         progress.TotalCountToDownload = downloadList.Count;
         progress.DownloadedCount = 0;
         progress.TotalBytesToDownload = brokenSize;
@@ -203,7 +203,7 @@ internal class EndfieldGameRepairer
             });
 
         SharedStatic.InstanceLogger.LogInformation(
-            $"[EndfieldRepairer] Re-verifying {downloadList.Count} newly downloaded files...");
+            $"[HgRepairer] Re-verifying {downloadList.Count} newly downloaded files...");
 
         progress.TotalCountToDownload = downloadList.Count;
         progress.DownloadedCount = 0;
@@ -228,10 +228,10 @@ internal class EndfieldGameRepairer
                     catch (Exception ex)
                     {
                         SharedStatic.InstanceLogger.LogDebug(
-                            $"[EndfieldRepairer] Target file delete failed: {ex.Message}");
+                            $"[HgRepairer] Target file delete failed: {ex.Message}");
                     }
 
-                    throw new Exception($"[EndfieldRepairer] MD5 mismatch after downloading {node.Path}");
+                    throw new Exception($"[HgRepairer] MD5 mismatch after downloading {node.Path}");
                 }
 
                 Interlocked.Add(ref progress.DownloadedBytes, node.Size);
@@ -241,7 +241,7 @@ internal class EndfieldGameRepairer
             });
 
         SharedStatic.InstanceLogger.LogInformation(
-            "[EndfieldRepairer] Integrity restored and double-verified completely!");
+            "[HgRepairer] Integrity restored and double-verified completely!");
     }
 
     private async Task DownloadFileAsync(string url, string tempPath, long expectedSize, CancellationToken token,
@@ -327,7 +327,7 @@ internal class EndfieldGameRepairer
                     throw new Exception($"Download failed after {maxRetries} attempts for {url} | Error: {ex.Message}");
 
                 SharedStatic.InstanceLogger.LogWarning(
-                    $"[EndfieldRepairer] Download interrupted, retrying ({attempt}/{maxRetries}) for {Path.GetFileName(url)}...");
+                    $"[HgRepairer] Download interrupted, retrying ({attempt}/{maxRetries}) for {Path.GetFileName(url)}...");
                 await Task.Delay(1000, token);
             }
     }

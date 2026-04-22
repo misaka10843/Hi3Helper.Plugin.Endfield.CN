@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Hi3Helper.Plugin.Endfield.Utils;
+namespace Hi3Helper.Hypergryph.Core.Utils;
 
 /// <summary>
 ///     Simulates multiple split volumes as a single contiguous stream to avoid physical merging.

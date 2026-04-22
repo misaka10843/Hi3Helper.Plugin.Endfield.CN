@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,22 +14,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Hi3Helper.Plugin.Core;
 using Hi3Helper.Plugin.Core.Management;
-using Hi3Helper.Plugin.Endfield.Management.Api;
-using Hi3Helper.Plugin.Endfield.Utils;
+using Hi3Helper.Hypergryph.Core.Management.Api;
+using Hi3Helper.Hypergryph.Core.Utils;
 using Microsoft.Extensions.Logging;
 using SevenZipExtractor;
 using SevenZipExtractor.Event;
 using SharpHDiffPatch.Core;
 
-namespace Hi3Helper.Plugin.Endfield.Management;
+namespace Hi3Helper.Hypergryph.Core.Management;
 
-internal partial class EndfieldGameInstaller
+public partial class HgGameInstaller
 {
     private sealed class Install
     {
-        private readonly EndfieldGameInstaller _owner;
+        private readonly HgGameInstaller _owner;
 
-        public Install(EndfieldGameInstaller owner)
+        public Install(HgGameInstaller owner)
         {
             _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         }
@@ -40,7 +40,7 @@ internal partial class EndfieldGameInstaller
             _ = kind;
             await _owner.InitAsync(token).ConfigureAwait(false);
 
-            if (_owner.GameManager is not EndfieldGameManager manager || manager.GamePacks == null ||
+            if (_owner.GameManager is not HgGameManager manager || manager.GamePacks == null ||
                 manager.GamePacks.Count == 0)
                 throw new InvalidOperationException("No download packs found in API response.");
 
@@ -59,9 +59,9 @@ internal partial class EndfieldGameInstaller
             }
 
             Report(InstallProgressState.Preparing);
-            SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Verifying existing packages...");
+            SharedStatic.InstanceLogger.LogInformation("[HgInstaller] Verifying existing packages...");
 
-            var packsToDownload = new ConcurrentBag<EndfieldPack>();
+            var packsToDownload = new ConcurrentBag<HgPack>();
             long totalBytesToDownload = 0;
             long alreadyDownloadedBytes = 0;
 
@@ -124,7 +124,7 @@ internal partial class EndfieldGameInstaller
                                 catch (Exception ex)
                                 {
                                     SharedStatic.InstanceLogger.LogDebug(
-                                        $"[Endfield] Temp file delete failed: {ex.Message}");
+                                        $"[HgCore] Temp file delete failed: {ex.Message}");
                                 }
 
                         packsToDownload.Add(pack);
@@ -149,7 +149,7 @@ internal partial class EndfieldGameInstaller
             {
                 Report(InstallProgressState.Download);
                 SharedStatic.InstanceLogger.LogInformation(
-                    $"[EndfieldInstaller] Downloading {downloadTasks.Count} files...");
+                    $"[HgInstaller] Downloading {downloadTasks.Count} files...");
 
                 await Parallel.ForEachAsync(downloadTasks, new ParallelOptions
                 {
@@ -180,7 +180,7 @@ internal partial class EndfieldGameInstaller
                             catch (Exception ex)
                             {
                                 SharedStatic.InstanceLogger.LogDebug(
-                                    $"[Endfield] Temp file delete failed: {ex.Message}");
+                                    $"[HgCore] Temp file delete failed: {ex.Message}");
                             }
 
                             throw new Exception($"MD5 Mismatch after downloading {fileName}");
@@ -199,8 +199,8 @@ internal partial class EndfieldGameInstaller
             if (manager.IsDeltaUpdate)
             {
                 SharedStatic.InstanceLogger.LogInformation(
-                    "[EndfieldInstaller] Delta update mechanism confirmed. Initializing sandbox extraction...");
-                var tempExtractDir = Path.Combine(installPath, "_Endfield_DeltaTemp");
+                    "[HgInstaller] Delta update mechanism confirmed. Initializing sandbox extraction...");
+                var tempExtractDir = Path.Combine(installPath, "_Hg_DeltaTemp");
                 // DEBUG
                 var skipExtractForDebug = false;
 
@@ -220,7 +220,7 @@ internal partial class EndfieldGameInstaller
 
                 Report(InstallProgressState.Removing);
                 SharedStatic.InstanceLogger.LogInformation(
-                    "[EndfieldInstaller] Cleaning up legacy files and updating core components...");
+                    "[HgInstaller] Cleaning up legacy files and updating core components...");
 
                 var deleteListPath = Path.Combine(tempExtractDir, "delete_files.txt");
                 if (File.Exists(deleteListPath))
@@ -237,14 +237,14 @@ internal partial class EndfieldGameInstaller
                             }
                             catch (Exception ex)
                             {
-                                SharedStatic.InstanceLogger.LogDebug($"[Endfield] File delete failed: {ex.Message}");
+                                SharedStatic.InstanceLogger.LogDebug($"[HgCore] File delete failed: {ex.Message}");
                             }
                     }
                 }
 
                 Report(InstallProgressState.Updating);
                 SharedStatic.InstanceLogger.LogInformation(
-                    "[EndfieldInstaller] Copying static update files...");
+                    "[HgInstaller] Copying static update files...");
                 foreach (var newPath in Directory.GetFiles(tempExtractDir, "*.*", SearchOption.AllDirectories))
                 {
                     var relPath = Path.GetRelativePath(tempExtractDir, newPath);
@@ -283,13 +283,13 @@ internal partial class EndfieldGameInstaller
                     }
                     catch (Exception ex)
                     {
-                        SharedStatic.InstanceLogger.LogDebug($"[Endfield] Temp dir cleanup failed: {ex.Message}");
+                        SharedStatic.InstanceLogger.LogDebug($"[HgCore] Temp dir cleanup failed: {ex.Message}");
                     }
             }
             else
             {
                 Report(InstallProgressState.Install);
-                SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Full update mechanism confirmed.");
+                SharedStatic.InstanceLogger.LogInformation("[HgInstaller] Full update mechanism confirmed.");
                 await ExtractPackagesAsync(downloadDir, installPath, token, (extractedBytes, totalBytes) =>
                 {
                     progress.DownloadedBytes = extractedBytes;
@@ -304,15 +304,15 @@ internal partial class EndfieldGameInstaller
             }
             catch (Exception ex)
             {
-                SharedStatic.InstanceLogger.LogDebug($"[Endfield] Download dir cleanup failed: {ex.Message}");
+                SharedStatic.InstanceLogger.LogDebug($"[HgCore] Download dir cleanup failed: {ex.Message}");
             }
 
             SharedStatic.InstanceLogger.LogInformation(
-                "[EndfieldInstaller] Update phase completed. Initiating post-update integrity verification...");
+                "[HgInstaller] Update phase completed. Initiating post-update integrity verification...");
 
             try
             {
-                var repairer = new EndfieldGameRepairer(_owner._downloadHttpClient, manager, installPath);
+                var repairer = new HgGameRepairer(_owner._downloadHttpClient, manager, installPath);
                 await repairer.StartRepairAsync(progressDelegate, progressStateDelegate, token);
                 var newConfigPath = Path.Combine(installPath, "config.ini.new");
                 var targetConfigPath = Path.Combine(installPath, "config.ini");
@@ -328,13 +328,13 @@ internal partial class EndfieldGameInstaller
                     }
 
                     SharedStatic.InstanceLogger.LogInformation(
-                        "[EndfieldInstaller] config.ini successfully updated after full verification.");
+                        "[HgInstaller] config.ini successfully updated after full verification.");
                 }
             }
             catch (Exception ex)
             {
                 SharedStatic.InstanceLogger.LogError(
-                    $"[EndfieldInstaller] Post-update integrity verification failed: {ex}");
+                    $"[HgInstaller] Post-update integrity verification failed: {ex}");
                 throw;
             }
 
@@ -344,49 +344,49 @@ internal partial class EndfieldGameInstaller
         private async Task ApplyDeltaPatchAsync(string tempExtractDir, string targetGameRoot, string? patchJsonUrl,
             CancellationToken token, Action<long, long>? progressCallback = null)
         {
-            EndfieldPatchManifest? manifest = null;
+            HgPatchManifest? manifest = null;
             var localPatchJsonPath = Path.Combine(tempExtractDir, "patch.json");
 
             // 检查增量包中是否有修补文件清单
             if (File.Exists(localPatchJsonPath))
             {
                 SharedStatic.InstanceLogger.LogInformation(
-                    "[EndfieldInstaller] Found local patch.json in sandbox. Reading manifest...");
+                    "[HgInstaller] Found local patch.json in sandbox. Reading manifest...");
                 await using var fs = File.OpenRead(localPatchJsonPath);
-                manifest = await JsonSerializer.DeserializeAsync(fs, EndfieldApiContext.Default.EndfieldPatchManifest,
+                manifest = await JsonSerializer.DeserializeAsync(fs, HgApiContext.Default.HgPatchManifest,
                     token);
             }
             // 检查API是否有修补文件清单
             else if (!string.IsNullOrEmpty(patchJsonUrl))
             {
                 SharedStatic.InstanceLogger.LogInformation(
-                    $"[EndfieldInstaller] Fetching delta patch manifest from URL: {patchJsonUrl}");
+                    $"[HgInstaller] Fetching delta patch manifest from URL: {patchJsonUrl}");
                 using var httpClient = new HttpClient();
                 using var response =
                     await httpClient.GetAsync(patchJsonUrl, HttpCompletionOption.ResponseHeadersRead, token);
                 response.EnsureSuccessStatusCode();
-                manifest = await response.Content.ReadFromJsonAsync(EndfieldApiContext.Default.EndfieldPatchManifest,
+                manifest = await response.Content.ReadFromJsonAsync(HgApiContext.Default.HgPatchManifest,
                     token);
             }
             // 如果两边都没有就直接跳过修补，代表仅覆盖即可
             else
             {
                 SharedStatic.InstanceLogger.LogInformation(
-                    "[EndfieldInstaller] No patch.json found and no URL provided. Assuming static-only delta update. Skipping VFS patching.");
+                    "[HgInstaller] No patch.json found and no URL provided. Assuming static-only delta update. Skipping VFS patching.");
                 return;
             }
 
             if (manifest == null || manifest.Files == null)
                 throw new InvalidDataException(
-                    "[EndfieldInstaller] Failed to load or deserialize Patch Manifest (patch.json).");
+                    "[HgInstaller] Failed to load or deserialize Patch Manifest (patch.json).");
 
             var vfsBasePath = Path.Combine(targetGameRoot,
-                (manifest.VfsBasePath ?? "Endfield_Data/StreamingAssets/VFS").Replace("/", "\\"));
+                (manifest.VfsBasePath ?? "Hg_Data/StreamingAssets/VFS").Replace("/", "\\"));
 
             var totalPatchSize = manifest.Files.Sum(f => f.Size);
             long currentPatchedSize = 0;
 
-            SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Building temporary extraction file map...");
+            SharedStatic.InstanceLogger.LogInformation("[HgInstaller] Building temporary extraction file map...");
             var extractFileMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             await Task.Run(() =>
@@ -395,7 +395,7 @@ internal partial class EndfieldGameInstaller
                 foreach (var file in allExtractedFiles) extractFileMap[Path.GetFileName(file)] = file;
             }, token);
 
-            SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Starting VFS delta patch pipeline...");
+            SharedStatic.InstanceLogger.LogInformation("[HgInstaller] Starting VFS delta patch pipeline...");
 
             foreach (var fileNode in manifest.Files)
             {
@@ -418,7 +418,7 @@ internal partial class EndfieldGameInstaller
                         File.Copy(sourceExtractedFile, targetFilePath, true);
                         Interlocked.Add(ref currentPatchedSize, fileNode.Size);
                         progressCallback?.Invoke(currentPatchedSize, totalPatchSize);
-                        SharedStatic.InstanceLogger.LogDebug($"[EndfieldInstaller] [Copy] {fileNode.Name}");
+                        SharedStatic.InstanceLogger.LogDebug($"[HgInstaller] [Copy] {fileNode.Name}");
                     }
                 }
                 else if (fileNode.Patches != null && fileNode.Patches.Count > 0)
@@ -447,12 +447,12 @@ internal partial class EndfieldGameInstaller
 
                             hdiffPatcher.Patch(baseFilePath, tempOutPath, true, onPatchProgress, token);
                             File.Move(tempOutPath, targetFilePath, true);
-                            SharedStatic.InstanceLogger.LogDebug($"[EndfieldInstaller] [Patch] {fileNode.Name}");
+                            SharedStatic.InstanceLogger.LogDebug($"[HgInstaller] [Patch] {fileNode.Name}");
                         }
                         catch (Exception ex)
                         {
                             SharedStatic.InstanceLogger.LogError(
-                                $"[EndfieldInstaller] Delta patch failed for {fileNode.Name}. Error: {ex.Message}");
+                                $"[HgInstaller] Delta patch failed for {fileNode.Name}. Error: {ex.Message}");
                             if (File.Exists(tempOutPath)) File.Delete(tempOutPath);
                             throw;
                         }
@@ -461,7 +461,7 @@ internal partial class EndfieldGameInstaller
             }
 
             SharedStatic.InstanceLogger.LogInformation(
-                "[EndfieldInstaller] VFS delta patch pipeline executed successfully.");
+                "[HgInstaller] VFS delta patch pipeline executed successfully.");
         }
 
         private async Task DownloadFileAsync(string url, string tempPath, long expectedSize, CancellationToken token,
@@ -549,7 +549,7 @@ internal partial class EndfieldGameInstaller
                         throw new Exception(
                             $"Download failed after {maxRetries} attempts for {url} | Error: {ex.Message}");
                     SharedStatic.InstanceLogger.LogWarning(
-                        $"[EndfieldInstaller] Download interrupted, retrying ({attempt}/{maxRetries}) for {Path.GetFileName(url)}...");
+                        $"[HgInstaller] Download interrupted, retrying ({attempt}/{maxRetries}) for {Path.GetFileName(url)}...");
                     await Task.Delay(1000, token);
                 }
         }
@@ -568,7 +568,7 @@ internal partial class EndfieldGameInstaller
             Action<long, long>? progressCallback)
         {
             SharedStatic.InstanceLogger.LogInformation(
-                $"[EndfieldInstaller] Preparing decompression (Virtual merge stream): {sourceDir} -> {destDir}");
+                $"[HgInstaller] Preparing decompression (Virtual merge stream): {sourceDir} -> {destDir}");
 
             var partFiles = Directory.GetFiles(sourceDir)
                 .Where(f => f.EndsWith(".zip.001", StringComparison.OrdinalIgnoreCase) ||
@@ -617,11 +617,11 @@ internal partial class EndfieldGameInstaller
                         archiveFile.ExtractProgress -= ZipProgressAdapter;
                     }
 
-                    SharedStatic.InstanceLogger.LogInformation("[EndfieldInstaller] Decompression complete!");
+                    SharedStatic.InstanceLogger.LogInformation("[HgInstaller] Decompression complete!");
                 }
                 catch (Exception ex)
                 {
-                    SharedStatic.InstanceLogger.LogError($"[EndfieldInstaller] Decompression failed: {ex}");
+                    SharedStatic.InstanceLogger.LogError($"[HgInstaller] Decompression failed: {ex}");
                     throw;
                 }
             }, token);

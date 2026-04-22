@@ -1,45 +1,45 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Hi3Helper.Plugin.Endfield.Management.Api;
+namespace Hi3Helper.Hypergryph.Core.Management.Api;
 
 // ==========================================
 // 请求结构
 // ==========================================
-public class EndfieldBatchRequest
+public class HgBatchRequest
 {
     [JsonPropertyName("seq")] public string Seq { get; set; } = null!;
 
-    [JsonPropertyName("proxy_reqs")] public List<EndfieldProxyRequest> ProxyReqs { get; set; } = new();
+    [JsonPropertyName("proxy_reqs")] public List<HgProxyRequest> ProxyReqs { get; set; } = new();
 }
 
-public class EndfieldProxyRequest
+public class HgProxyRequest
 {
     [JsonPropertyName("kind")] public string Kind { get; set; } = null!;
 
     [JsonPropertyName("get_latest_game_req")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public EndfieldGetLatestGameReq? GetLatestGameReq { get; set; }
+    public HgGetLatestGameReq? GetLatestGameReq { get; set; }
 
     // 通用请求体用于 Banner, News, BgImage, Sidebar
     [JsonPropertyName("get_banner_req")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public EndfieldCommonReq? GetBannerReq { get; set; }
+    public HgCommonReq? GetBannerReq { get; set; }
 
     [JsonPropertyName("get_announcement_req")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public EndfieldCommonReq? GetAnnouncementReq { get; set; }
+    public HgCommonReq? GetAnnouncementReq { get; set; }
 
     [JsonPropertyName("get_main_bg_image_req")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public EndfieldCommonReq? GetMainBgImageReq { get; set; }
+    public HgCommonReq? GetMainBgImageReq { get; set; }
 
     [JsonPropertyName("get_sidebar_req")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public EndfieldCommonReq? GetSidebarReq { get; set; }
+    public HgCommonReq? GetSidebarReq { get; set; }
 }
 
-public class EndfieldGetLatestGameReq
+public class HgGetLatestGameReq
 {
     [JsonPropertyName("appcode")] public string AppCode { get; set; } = null!;
     [JsonPropertyName("channel")] public string Channel { get; set; } = null!;
@@ -48,7 +48,7 @@ public class EndfieldGetLatestGameReq
     [JsonPropertyName("launcher_appcode")] public string LauncherAppCode { get; set; } = null!;
 }
 
-public class EndfieldCommonReq
+public class HgCommonReq
 {
     [JsonPropertyName("appcode")] public string AppCode { get; set; } = null!;
     [JsonPropertyName("language")] public string Language { get; set; } = "zh-cn";
@@ -61,46 +61,46 @@ public class EndfieldCommonReq
 // ==========================================
 // 响应结构
 // ==========================================
-public class EndfieldBatchResponse
+public class HgBatchResponse
 {
-    [JsonPropertyName("proxy_rsps")] public List<EndfieldProxyResponse>? ProxyRsps { get; set; }
+    [JsonPropertyName("proxy_rsps")] public List<HgProxyResponse>? ProxyRsps { get; set; }
 }
 
-public class EndfieldProxyResponse
+public class HgProxyResponse
 {
     [JsonPropertyName("kind")] public string? Kind { get; set; }
 
     [JsonPropertyName("get_latest_game_rsp")]
-    public EndfieldGetLatestGameRsp? GetLatestGameRsp { get; set; }
+    public HgGetLatestGameRsp? GetLatestGameRsp { get; set; }
 
-    [JsonPropertyName("get_banner_rsp")] public EndfieldGetBannerRsp? GetBannerRsp { get; set; }
+    [JsonPropertyName("get_banner_rsp")] public HgGetBannerRsp? GetBannerRsp { get; set; }
 
     [JsonPropertyName("get_announcement_rsp")]
-    public EndfieldGetAnnouncementRsp? GetAnnouncementRsp { get; set; }
+    public HgGetAnnouncementRsp? GetAnnouncementRsp { get; set; }
 
     [JsonPropertyName("get_main_bg_image_rsp")]
-    public EndfieldGetMainBgImageRsp? GetMainBgImageRsp { get; set; }
+    public HgGetMainBgImageRsp? GetMainBgImageRsp { get; set; }
 
-    [JsonPropertyName("get_sidebar_rsp")] public EndfieldGetSidebarRsp? GetSidebarRsp { get; set; }
+    [JsonPropertyName("get_sidebar_rsp")] public HgGetSidebarRsp? GetSidebarRsp { get; set; }
 }
 
 // --- 版本信息 ---
-public class EndfieldGetLatestGameRsp
+public class HgGetLatestGameRsp
 {
     [JsonPropertyName("action")] public int Action { get; set; }
     [JsonPropertyName("version")] public string? Version { get; set; }
-    [JsonPropertyName("pkg")] public EndfieldPkgInfo? Pkg { get; set; }
-    [JsonPropertyName("patch")] public EndfieldPatchInfo? Patch { get; set; }
+    [JsonPropertyName("pkg")] public HgPkgInfo? Pkg { get; set; }
+    [JsonPropertyName("patch")] public HgPatchInfo? Patch { get; set; }
 }
 
 // --- 增量更新 ---
-public class EndfieldPatchInfo
+public class HgPatchInfo
 {
     [JsonPropertyName("url")] public string? Url { get; set; }
     [JsonPropertyName("md5")] public string? Md5 { get; set; }
     [JsonPropertyName("package_size")] public string? PackageSize { get; set; }
     [JsonPropertyName("total_size")] public string? TotalSize { get; set; }
-    [JsonPropertyName("patches")] public List<EndfieldPack>? Patches { get; set; }
+    [JsonPropertyName("patches")] public List<HgPack>? Patches { get; set; }
 
     [JsonPropertyName("v2_patch_info_url")]
     public string? V2PatchInfoUrl { get; set; }
@@ -109,38 +109,38 @@ public class EndfieldPatchInfo
     public string? V2PatchInfoMd5 { get; set; }
 }
 
-public class EndfieldPatchManifest
+public class HgPatchManifest
 {
     [JsonPropertyName("version")] public string? Version { get; set; }
     [JsonPropertyName("vfs_base_path")] public string? VfsBasePath { get; set; }
-    [JsonPropertyName("files")] public List<EndfieldPatchFile>? Files { get; set; }
+    [JsonPropertyName("files")] public List<HgPatchFile>? Files { get; set; }
 }
 
 // --- 增量更新内容 ---
-public class EndfieldPatchFile
+public class HgPatchFile
 {
     [JsonPropertyName("name")] public string? Name { get; set; }
     [JsonPropertyName("md5")] public string? Md5 { get; set; }
     [JsonPropertyName("size")] public long Size { get; set; }
     [JsonPropertyName("diffType")] public int DiffType { get; set; }
     [JsonPropertyName("local_path")] public string? LocalPath { get; set; }
-    [JsonPropertyName("patch")] public List<EndfieldPatchNode>? Patches { get; set; }
+    [JsonPropertyName("patch")] public List<HgPatchNode>? Patches { get; set; }
 }
 
-public class EndfieldPatchNode
+public class HgPatchNode
 {
     [JsonPropertyName("base_file")] public string? BaseFile { get; set; }
     [JsonPropertyName("base_md5")] public string? BaseMd5 { get; set; }
     [JsonPropertyName("patch")] public string? PatchPath { get; set; }
 }
 
-public class EndfieldPkgInfo
+public class HgPkgInfo
 {
-    [JsonPropertyName("packs")] public List<EndfieldPack>? Packs { get; set; }
+    [JsonPropertyName("packs")] public List<HgPack>? Packs { get; set; }
     [JsonPropertyName("file_path")] public string? FilePath { get; set; }
 }
 
-public class EndfieldPack
+public class HgPack
 {
     [JsonPropertyName("url")] public string? Url { get; set; }
     [JsonPropertyName("md5")] public string? Md5 { get; set; }
@@ -148,30 +148,30 @@ public class EndfieldPack
 }
 
 // --- Banner ---
-public class EndfieldGetBannerRsp
+public class HgGetBannerRsp
 {
-    [JsonPropertyName("banners")] public List<EndfieldBanner>? Banners { get; set; }
+    [JsonPropertyName("banners")] public List<HgBanner>? Banners { get; set; }
 }
 
-public class EndfieldBanner
+public class HgBanner
 {
     [JsonPropertyName("url")] public string? Url { get; set; }
     [JsonPropertyName("jump_url")] public string? JumpUrl { get; set; }
 }
 
 // --- 公告 ---
-public class EndfieldGetAnnouncementRsp
+public class HgGetAnnouncementRsp
 {
-    [JsonPropertyName("tabs")] public List<EndfieldAnnouncementTab>? Tabs { get; set; }
+    [JsonPropertyName("tabs")] public List<HgAnnouncementTab>? Tabs { get; set; }
 }
 
-public class EndfieldAnnouncementTab
+public class HgAnnouncementTab
 {
     [JsonPropertyName("tabName")] public string? TabName { get; set; }
-    [JsonPropertyName("announcements")] public List<EndfieldAnnouncement>? Announcements { get; set; }
+    [JsonPropertyName("announcements")] public List<HgAnnouncement>? Announcements { get; set; }
 }
 
-public class EndfieldAnnouncement
+public class HgAnnouncement
 {
     [JsonPropertyName("content")] public string? Content { get; set; }
     [JsonPropertyName("jump_url")] public string? JumpUrl { get; set; }
@@ -179,45 +179,45 @@ public class EndfieldAnnouncement
 }
 
 // --- 背景图 ---
-public class EndfieldGetMainBgImageRsp
+public class HgGetMainBgImageRsp
 {
-    [JsonPropertyName("main_bg_image")] public EndfieldBgImageInfo? MainBgImage { get; set; }
+    [JsonPropertyName("main_bg_image")] public HgBgImageInfo? MainBgImage { get; set; }
 }
 
-public class EndfieldBgImageInfo
+public class HgBgImageInfo
 {
     [JsonPropertyName("url")] public string? Url { get; set; }
     [JsonPropertyName("video_url")] public string? VideoUrl { get; set; }
 }
 
 // --- Sidebar ---
-public class EndfieldGetSidebarRsp
+public class HgGetSidebarRsp
 {
-    [JsonPropertyName("sidebars")] public List<EndfieldSidebar>? Sidebars { get; set; }
+    [JsonPropertyName("sidebars")] public List<HgSidebar>? Sidebars { get; set; }
 }
 
-public class EndfieldSidebar
+public class HgSidebar
 {
     [JsonPropertyName("media")] public string? Media { get; set; }
-    [JsonPropertyName("pic")] public EndfieldSidebarPic? Pic { get; set; }
+    [JsonPropertyName("pic")] public HgSidebarPic? Pic { get; set; }
     [JsonPropertyName("jump_url")] public string? JumpUrl { get; set; }
-    [JsonPropertyName("sidebar_labels")] public List<EndfieldSidebarLabel>? SidebarLabels { get; set; }
+    [JsonPropertyName("sidebar_labels")] public List<HgSidebarLabel>? SidebarLabels { get; set; }
 }
 
-public class EndfieldSidebarPic
+public class HgSidebarPic
 {
     [JsonPropertyName("url")] public string? Url { get; set; }
     [JsonPropertyName("description")] public string? Description { get; set; }
 }
 
-public class EndfieldSidebarLabel
+public class HgSidebarLabel
 {
     [JsonPropertyName("content")] public string? Content { get; set; }
     [JsonPropertyName("jump_url")] public string? JumpUrl { get; set; }
 }
 
 // --- 游戏完整性校验节点 ---
-public class EndfieldManifestNode
+public class HgManifestNode
 {
     [JsonPropertyName("path")] public string? Path { get; set; }
     [JsonPropertyName("md5")] public string? Md5 { get; set; }

@@ -1,15 +1,15 @@
 ﻿using System.IO;
 
-namespace Hi3Helper.Plugin.Endfield.Utils;
+namespace Hi3Helper.Hypergryph.Core.Utils;
 
 /// <summary>
-///     Parser for Endfield config.ini values.
+///     Parser for Hg config.ini values.
 /// </summary>
 public static class ConfigTool
 {
     public static string ReadConfig(string filePath)
     {
-        return EndfieldCrypto.DecryptFileToString(filePath);
+        return HgCrypto.DecryptFileToString(filePath);
     }
 
     public static string? ParseVersion(string content)

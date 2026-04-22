@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices.Marshalling;
 using Hi3Helper.Plugin.Core;
 using Hi3Helper.Plugin.Core.Management.PresetConfig;
@@ -6,6 +6,7 @@ using Hi3Helper.Plugin.Core.Update;
 using Hi3Helper.Plugin.Core.Utility;
 using Hi3Helper.Plugin.Endfield.Management.PresetConfig;
 using Hi3Helper.Plugin.Endfield.Utils;
+using Hi3Helper.Hypergryph.Core.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Hi3Helper.Plugin.Endfield;

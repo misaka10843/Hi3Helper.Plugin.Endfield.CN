@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -10,14 +10,14 @@ using Hi3Helper.Plugin.Core.Management;
 using Hi3Helper.Plugin.Core.Utility;
 using Microsoft.Extensions.Logging;
 
-namespace Hi3Helper.Plugin.Endfield.Management;
+namespace Hi3Helper.Hypergryph.Core.Management;
 
 [GeneratedComClass]
-internal partial class EndfieldGameInstaller : GameInstallerBase
+public partial class HgGameInstaller : GameInstallerBase
 {
     private readonly HttpClient _downloadHttpClient;
 
-    internal EndfieldGameInstaller(IGameManager? gameManager) : base(gameManager)
+    public HgGameInstaller(IGameManager? gameManager) : base(gameManager)
     {
         _downloadHttpClient = new PluginHttpClientBuilder()
             .SetAllowedDecompression(DecompressionMethods.GZip)
@@ -29,10 +29,10 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
 
     protected override async Task<int> InitAsync(CancellationToken token)
     {
-        if (GameManager is not EndfieldGameManager endfieldManager)
-            throw new InvalidOperationException("GameManager is not EndfieldGameManager");
+        if (GameManager is not HgGameManager HgManager)
+            throw new InvalidOperationException("GameManager is not HgGameManager");
 
-        return await endfieldManager.InitAsyncInner(true, token).ConfigureAwait(false);
+        return await HgManager.InitAsyncInner(true, token).ConfigureAwait(false);
     }
 
     protected override async Task<long> GetGameSizeAsyncInner(GameInstallerKind gameInstallerKind,
@@ -40,7 +40,7 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
     {
         await InitAsync(token).ConfigureAwait(false);
 
-        if (GameManager is not EndfieldGameManager { GamePacks: { } packs }) return 0L;
+        if (GameManager is not HgGameManager { GamePacks: { } packs }) return 0L;
 
         long totalSize = 0;
         foreach (var pack in packs)
@@ -53,7 +53,7 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
         CancellationToken token)
     {
         await InitAsync(token).ConfigureAwait(false);
-        if (GameManager is not EndfieldGameManager { GamePacks: { } packs }) return 0L;
+        if (GameManager is not HgGameManager { GamePacks: { } packs }) return 0L;
 
         GameManager.GetGamePath(out var installPath);
         if (string.IsNullOrEmpty(installPath)) return 0L;
@@ -124,7 +124,7 @@ internal partial class EndfieldGameInstaller : GameInstallerBase
         }
         catch (Exception ex)
         {
-            SharedStatic.InstanceLogger.LogError($"[Endfield] Uninstall failed: {ex.Message}");
+            SharedStatic.InstanceLogger.LogError($"[HgCore] Uninstall failed: {ex.Message}");
         }
 
         return Task.CompletedTask;

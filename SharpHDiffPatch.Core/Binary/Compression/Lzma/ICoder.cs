@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace SharpCompress.Compressors.LZMA
+namespace SharpHDiffPatch.Core.Binary.Compression.Lzma
 {
     /// <summary>
     /// The exception that is thrown when an error in input stream occurs during decoding.

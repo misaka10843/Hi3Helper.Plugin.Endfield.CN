@@ -3,8 +3,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-using SharpCompress.Compressors.BZip2;
-using SharpCompress.Compressors.LZMA;
 using SharpHDiffPatch.Core.Binary.Streams;
 using System;
 #if NET6_0_OR_GREATER
@@ -13,6 +11,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using SharpHDiffPatch.Core.Binary.Compression.BZip2;
+using SharpHDiffPatch.Core.Binary.Compression.Lzma;
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
 using ZstdManagedDecompressor = ZstdSharp.Decompressor;
 using ZstdManagedDecompressorParameter = ZstdSharp.Unsafe.ZSTD_dParameter;

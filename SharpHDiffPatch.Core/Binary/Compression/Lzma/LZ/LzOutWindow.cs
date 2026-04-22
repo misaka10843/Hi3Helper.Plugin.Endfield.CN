@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace SharpCompress.Compressors.LZMA.LZ
+namespace SharpHDiffPatch.Core.Binary.Compression.Lzma.LZ
 {
     internal class OutWindow
     {

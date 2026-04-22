@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SharpCompress.Compressors.LZMA
+namespace SharpHDiffPatch.Core.Binary.Compression.Lzma
 {
     internal class BitVector
     {

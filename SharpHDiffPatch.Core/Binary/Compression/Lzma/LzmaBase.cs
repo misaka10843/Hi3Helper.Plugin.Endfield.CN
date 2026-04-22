@@ -1,4 +1,4 @@
-namespace SharpCompress.Compressors.LZMA
+namespace SharpHDiffPatch.Core.Binary.Compression.Lzma
 {
     internal abstract class Base
     {

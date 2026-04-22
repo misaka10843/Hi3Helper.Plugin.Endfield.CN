@@ -1,9 +1,9 @@
 using System;
 using System.Buffers.Binary;
 using System.IO;
-using SharpCompress.Compressors.LZMA.LZ;
+using SharpHDiffPatch.Core.Binary.Compression.Lzma.LZ;
 
-namespace SharpCompress.Compressors.LZMA
+namespace SharpHDiffPatch.Core.Binary.Compression.Lzma
 {
     internal class LzmaStream : Stream
     {

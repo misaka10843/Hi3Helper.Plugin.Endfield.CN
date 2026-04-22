@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace SharpCompress.Compressors.LZMA.RangeCoder
+namespace SharpHDiffPatch.Core.Binary.Compression.Lzma.RangeCoder
 {
     internal class Decoder
     {

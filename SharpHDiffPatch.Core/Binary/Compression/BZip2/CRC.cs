@@ -20,7 +20,7 @@
  * great code.
  */
 
-namespace SharpCompress.Compressors.BZip2
+namespace SharpHDiffPatch.Core.Binary.Compression.BZip2
 {
     /**
       * A simple class the hold and calculate the CRC for sanity checking

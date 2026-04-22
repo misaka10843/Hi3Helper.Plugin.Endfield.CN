@@ -23,7 +23,7 @@ using System.IO;
  * great code.
  */
 
-namespace SharpCompress.Compressors.BZip2
+namespace SharpHDiffPatch.Core.Binary.Compression.BZip2
 {
     /**
       * An input stream that decompresses from the BZip2 format (with the file

@@ -1,4 +1,4 @@
-namespace SharpCompress.Compressors.LZMA.RangeCoder
+namespace SharpHDiffPatch.Core.Binary.Compression.Lzma.RangeCoder
 {
     internal readonly struct BitTreeDecoder
     {

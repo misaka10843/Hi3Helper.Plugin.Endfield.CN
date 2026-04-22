@@ -175,10 +175,9 @@ jobs:
           New-Item -ItemType Directory -Force -Path $targetPath/build
           New-Item -ItemType Directory -Force -Path $targetPath/Lib
 
-          Copy-Item -Path ./publish_output/$shortName.dll -Destination $targetPath/ -ErrorAction SilentlyContinue
-          Copy-Item -Path ./publish_output/$shortName.pdb -Destination $targetPath/ -ErrorAction SilentlyContinue
+          Copy-Item -Path ./publish_output/*.dll -Destination $targetPath/ -ErrorAction SilentlyContinue
+          Copy-Item -Path ./publish_output/*.pdb -Destination $targetPath/ -ErrorAction SilentlyContinue
           Copy-Item -Path ./publish_output/manifest.json -Destination $targetPath/ -ErrorAction SilentlyContinue
-          Copy-Item -Path ./publish_output/SevenZipExtractor.pdb -Destination $targetPath/ -ErrorAction SilentlyContinue
           Copy-Item -Path "./publish_output/Lib/*" -Destination "$targetPath/Lib/" -Recurse -Force -ErrorAction SilentlyContinue
           Copy-Item -Path ./publish_output/*.zip -Destination $targetPath/build/
 

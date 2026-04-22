@@ -34,6 +34,21 @@ public partial class HgGameInstaller
             _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         }
 
+        private static void ForceDeleteFile(string filePath)
+        {
+            if (!File.Exists(filePath)) return;
+            try
+            {
+                File.SetAttributes(filePath, FileAttributes.Normal);
+            }
+            catch
+            {
+                /* ignored */
+            }
+
+            File.Delete(filePath);
+        }
+
         public async Task RunAsync(GameInstallerKind kind, InstallProgressDelegate? progressDelegate,
             InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
         {
@@ -104,12 +119,12 @@ public partial class HgGameInstaller
                             }
                             else
                             {
-                                File.Delete(filePath);
+                                ForceDeleteFile(filePath);
                             }
                         }
                         else
                         {
-                            File.Delete(filePath);
+                            ForceDeleteFile(filePath);
                         }
                     }
 
@@ -119,7 +134,7 @@ public partial class HgGameInstaller
                             if (new FileInfo(tempPath).Length > size)
                                 try
                                 {
-                                    File.Delete(tempPath);
+                                    ForceDeleteFile(tempPath);
                                 }
                                 catch (Exception ex)
                                 {
@@ -175,7 +190,7 @@ public partial class HgGameInstaller
                         {
                             try
                             {
-                                File.Delete(tempPath);
+                                ForceDeleteFile(tempPath);
                             }
                             catch (Exception ex)
                             {
@@ -187,7 +202,7 @@ public partial class HgGameInstaller
                         }
                     }
 
-                    if (File.Exists(filePath)) File.Delete(filePath);
+                    ForceDeleteFile(filePath);
                     File.Move(tempPath, filePath);
 
                     Interlocked.Increment(ref progress.DownloadedCount);
@@ -233,7 +248,7 @@ public partial class HgGameInstaller
                         if (File.Exists(targetDeletePath))
                             try
                             {
-                                File.Delete(targetDeletePath);
+                                ForceDeleteFile(targetDeletePath);
                             }
                             catch (Exception ex)
                             {
@@ -264,6 +279,7 @@ public partial class HgGameInstaller
                     var destDir = Path.GetDirectoryName(destPath)!;
                     if (!Directory.Exists(destDir)) Directory.CreateDirectory(destDir);
 
+                    ForceDeleteFile(destPath);
                     File.Copy(newPath, destPath, true);
                 }
 
@@ -318,10 +334,11 @@ public partial class HgGameInstaller
                 var targetConfigPath = Path.Combine(installPath, "config.ini");
                 if (File.Exists(newConfigPath))
                 {
+                    ForceDeleteFile(targetConfigPath);
                     File.Copy(newConfigPath, targetConfigPath, true);
                     try
                     {
-                        File.Delete(newConfigPath);
+                        ForceDeleteFile(newConfigPath);
                     }
                     catch
                     {
@@ -415,6 +432,7 @@ public partial class HgGameInstaller
 
                     if (File.Exists(sourceExtractedFile))
                     {
+                        ForceDeleteFile(targetFilePath); // 拷贝前先强删目的文件
                         File.Copy(sourceExtractedFile, targetFilePath, true);
                         Interlocked.Add(ref currentPatchedSize, fileNode.Size);
                         progressCallback?.Invoke(currentPatchedSize, totalPatchSize);
@@ -446,6 +464,8 @@ public partial class HgGameInstaller
                             };
 
                             hdiffPatcher.Patch(baseFilePath, tempOutPath, true, onPatchProgress, token);
+
+                            ForceDeleteFile(targetFilePath); // 移动前先强删旧文件
                             File.Move(tempOutPath, targetFilePath, true);
                             SharedStatic.InstanceLogger.LogDebug($"[HgInstaller] [Patch] {fileNode.Name}");
                         }
@@ -453,7 +473,7 @@ public partial class HgGameInstaller
                         {
                             SharedStatic.InstanceLogger.LogError(
                                 $"[HgInstaller] Delta patch failed for {fileNode.Name}. Error: {ex.Message}");
-                            if (File.Exists(tempOutPath)) File.Delete(tempOutPath);
+                            if (File.Exists(tempOutPath)) ForceDeleteFile(tempOutPath);
                             throw;
                         }
                     }
@@ -479,7 +499,7 @@ public partial class HgGameInstaller
                         existingLength = new FileInfo(tempPath).Length;
                         if (existingLength > expectedSize)
                         {
-                            File.Delete(tempPath);
+                            ForceDeleteFile(tempPath);
                             existingLength = 0;
                         }
                     }
@@ -503,8 +523,7 @@ public partial class HgGameInstaller
                     if (existingLength > 0 && response.StatusCode != HttpStatusCode.PartialContent)
                     {
                         existingLength = 0;
-                        if (File.Exists(tempPath)) File.Delete(tempPath);
-
+                        ForceDeleteFile(tempPath);
                         if (totalReported > 0)
                         {
                             onProgress(-totalReported);

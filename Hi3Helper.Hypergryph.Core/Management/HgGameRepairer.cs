@@ -32,6 +32,22 @@ public class HgGameRepairer
         _installPath = installPath;
     }
 
+    private static void ForceDeleteFile(string filePath)
+    {
+        if (!File.Exists(filePath)) return;
+        try
+        {
+            // 恢复为正常文件
+            File.SetAttributes(filePath, FileAttributes.Normal);
+        }
+        catch
+        {
+            /* ignored */
+        }
+
+        File.Delete(filePath);
+    }
+
     public async Task StartRepairAsync(InstallProgressDelegate? progressDelegate,
         InstallProgressStateDelegate? progressStateDelegate, CancellationToken token)
     {
@@ -194,7 +210,7 @@ public class HgGameRepairer
                     Report(InstallProgressState.Download);
                 });
 
-                if (File.Exists(targetPath)) File.Delete(targetPath);
+                ForceDeleteFile(targetPath); // 强制删除旧文件，无视只读
                 File.Move(tempPath, targetPath);
 
                 Interlocked.Increment(ref progress.DownloadedCount);
@@ -223,7 +239,7 @@ public class HgGameRepairer
                 {
                     try
                     {
-                        File.Delete(targetPath);
+                        ForceDeleteFile(targetPath);
                     }
                     catch (Exception ex)
                     {
@@ -259,7 +275,7 @@ public class HgGameRepairer
                     existingLength = new FileInfo(tempPath).Length;
                     if (existingLength > expectedSize)
                     {
-                        File.Delete(tempPath);
+                        ForceDeleteFile(tempPath);
                         existingLength = 0;
                     }
                 }
@@ -283,7 +299,7 @@ public class HgGameRepairer
                 if (existingLength > 0 && response.StatusCode != HttpStatusCode.PartialContent)
                 {
                     existingLength = 0;
-                    if (File.Exists(tempPath)) File.Delete(tempPath);
+                    ForceDeleteFile(tempPath);
                     if (totalReported > 0)
                     {
                         onProgress(-totalReported);

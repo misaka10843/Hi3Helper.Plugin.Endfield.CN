@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Hi3Helper.Plugin.Arknights": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

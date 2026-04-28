@@ -44,6 +44,8 @@ updates from Collapse.
 >This plugin is not officially maintained by Collapse. Please do not submit issues to the official Collapse repository or official Discord.
 >
 >Please prioritize submitting issues in this repository. Submitting issues through other channels will not receive immediate support!
+>
+>Self-update is currently unstable. Please perform a manual update by downloading the latest release. A fix is in development and will be implemented in the next version.
 
 **If this plugin helps you, consider giving it a ⭐!**
 
